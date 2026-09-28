@@ -304,5 +304,6 @@ Incremental build log (each phase committed and pushed with passing tests):
 | 5 | Public scholarship discovery: listing with keyword/level/open filters, detail page with criteria, rules, documents and timeline | Done |
 | 6 | Applications: draft/edit/submit with deadline enforcement, duplicate prevention, guardian applications, status timeline and tracking | Done |
 | 7 | Private document upload/download with type/size validation, replace and delete, required documents enforced before submission | Done |
+| 8 | Two-stage verification: school and local education officer queues, jurisdiction scoping, approve/forward and return-for-correction with remarks | Done |
 
 Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

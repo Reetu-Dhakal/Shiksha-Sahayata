@@ -1,6 +1,7 @@
 @php
     $items = [
         ['route' => 'dashboard', 'label' => __('nav.dashboard')],
+        ['route' => 'verifications.index', 'label' => __('nav.verifications')],
     ];
 @endphp
 

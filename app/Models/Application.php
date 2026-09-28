@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\VerificationStage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,6 +56,18 @@ class Application extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(ApplicationDocument::class);
+    }
+
+    public function verifications(): HasMany
+    {
+        return $this->hasMany(Verification::class);
+    }
+
+    public function verificationFor(VerificationStage $stage): ?Verification
+    {
+        return $this->verifications->first(
+            fn (Verification $verification): bool => $verification->stage === $stage
+        );
     }
 
     public function isEditable(): bool

@@ -13,6 +13,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ScholarshipController as PublicScholarshipController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -59,8 +60,22 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{application}', [ApplicationController::class, 'destroy'])->whereNumber('application')->name('destroy');
         Route::get('/{application}/documents', [ApplicationDocumentController::class, 'index'])->whereNumber('application')->name('documents.index');
         Route::post('/{application}/documents', [ApplicationDocumentController::class, 'store'])->whereNumber('application')->name('documents.store');
-        Route::get('/{application}/documents/{document}/download', [ApplicationDocumentController::class, 'download'])->whereNumber('application')->whereNumber('document')->name('documents.download');
         Route::delete('/{application}/documents/{document}', [ApplicationDocumentController::class, 'destroy'])->whereNumber('application')->whereNumber('document')->name('documents.destroy');
+    });
+
+    Route::get(
+        'applications/{application}/documents/{document}/download',
+        [ApplicationDocumentController::class, 'download']
+    )->whereNumber('application')->whereNumber('document')
+        ->middleware('role:student,guardian,school_officer,local_officer,committee,admin')
+        ->name('applications.documents.download');
+
+    Route::middleware('role:school_officer,local_officer')->prefix('verifications')->name('verifications.')->group(function () {
+        Route::get('/', [VerificationController::class, 'index'])->name('index');
+        Route::get('/{application}', [VerificationController::class, 'show'])->whereNumber('application')->name('show');
+        Route::patch('/{application}/start', [VerificationController::class, 'start'])->whereNumber('application')->name('start');
+        Route::patch('/{application}/approve', [VerificationController::class, 'approve'])->whereNumber('application')->name('approve');
+        Route::patch('/{application}/return', [VerificationController::class, 'returnForCorrection'])->whereNumber('application')->name('return');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

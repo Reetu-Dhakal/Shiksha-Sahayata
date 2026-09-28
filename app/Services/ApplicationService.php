@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\NotificationType;
 use App\Enums\Role;
 use App\Models\Application;
 use App\Models\RequiredDocument;
@@ -15,6 +16,11 @@ use Illuminate\Validation\ValidationException;
 
 class ApplicationService
 {
+    public function __construct(
+        private readonly NotificationService $notifications,
+        private readonly AuditLogService $audit,
+    ) {}
+
     /**
      * @param  array<string, mixed>  $data
      */
@@ -112,6 +118,33 @@ class ApplicationService
             'return_remarks' => null,
         ]);
 
+        $params = [
+            'scholarship' => $application->scholarship->title,
+            'student' => $application->student->name,
+            'application' => (string) $application->id,
+        ];
+
+        $this->notifications->notifyMany(
+            $this->schoolOfficerIds($application),
+            NotificationType::APPLICATION_SUBMITTED,
+            $params,
+            route('verifications.index'),
+        );
+
+        $this->audit->record(
+            'application.submit',
+            sprintf(
+                'Application #%d for "%s" submitted by %s.',
+                $application->id,
+                $application->scholarship->title,
+                $actor->email,
+            ),
+            $application,
+            [],
+            ['status' => ApplicationStatus::SUBMITTED->value],
+            $actor,
+        );
+
         return $application;
     }
 
@@ -176,5 +209,25 @@ class ApplicationService
         if (! $this->canActFor($actor, $student, $scholarship)) {
             abort(403, 'You are not allowed to act on this application.');
         }
+    }
+
+    /**
+     * School officers of the applicant's school, falling back to admins when a school has no officer yet.
+     *
+     * @return list<int>
+     */
+    private function schoolOfficerIds(Application $application): array
+    {
+        $officerIds = User::query()
+            ->where('role', Role::SCHOOL_OFFICER->value)
+            ->where('school_id', $application->student->school_id)
+            ->pluck('id')
+            ->all();
+
+        if ($officerIds !== []) {
+            return $officerIds;
+        }
+
+        return User::query()->where('role', Role::ADMIN->value)->pluck('id')->all();
     }
 }

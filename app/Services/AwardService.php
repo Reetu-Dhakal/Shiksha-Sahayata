@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ApplicationStatus;
 use App\Enums\AwardStatus;
 use App\Enums\DisbursementStatus;
+use App\Enums\NotificationType;
 use App\Models\Application;
 use App\Models\Award;
 use App\Models\User;
@@ -14,6 +15,11 @@ use Illuminate\Validation\ValidationException;
 
 class AwardService
 {
+    public function __construct(
+        private readonly NotificationService $notifications,
+        private readonly AuditLogService $audit,
+    ) {}
+
     public function issue(Application $application, User $actor): Award
     {
         if ($application->status !== ApplicationStatus::SELECTED) {
@@ -28,7 +34,7 @@ class AwardService
             ]);
         }
 
-        return DB::transaction(function () use ($application, $actor): Award {
+        $award = DB::transaction(function () use ($application, $actor): Award {
             $award = Award::query()->create([
                 'application_id' => $application->id,
                 'award_number' => $this->nextAwardNumber(),
@@ -43,6 +49,32 @@ class AwardService
 
             return $award;
         });
+
+        $this->notifications->notifyMany(
+            [$application->submitted_by_user_id ?? $application->student->user_id],
+            NotificationType::AWARD_ISSUED,
+            [
+                'scholarship' => $application->scholarship->title,
+                'award' => $award->award_number,
+            ],
+            route('awards.index'),
+        );
+
+        $this->audit->record(
+            'award.issue',
+            sprintf(
+                'Award %s issued for application #%d (%s).',
+                $award->award_number,
+                $application->id,
+                $application->scholarship->title,
+            ),
+            $award,
+            [],
+            ['award_number' => $award->award_number, 'application_id' => $application->id],
+            $actor,
+        );
+
+        return $award;
     }
 
     public function revoke(Award $award, User $actor, string $reason): Award
@@ -59,6 +91,28 @@ class AwardService
             'disbursement_remarks' => $reason,
             'disbursement_updated_at' => now(),
         ]);
+
+        $application = $award->application;
+
+        $this->notifications->notifyMany(
+            [$application->submitted_by_user_id ?? $application->student->user_id],
+            NotificationType::AWARD_REVOKED,
+            [
+                'scholarship' => $application->scholarship->title,
+                'award' => $award->award_number,
+                'reason' => $reason,
+            ],
+            route('awards.index'),
+        );
+
+        $this->audit->record(
+            'award.revoke',
+            sprintf('Award %s revoked: %s', $award->award_number, $reason),
+            $award,
+            ['status' => AwardStatus::ACTIVE->value],
+            ['status' => AwardStatus::REVOKED->value, 'reason' => $reason],
+            $actor,
+        );
 
         return $award->refresh();
     }
@@ -81,6 +135,8 @@ class AwardService
             ]);
         }
 
+        $previous = $award->disbursement_status;
+
         DB::transaction(function () use ($award, $status, $remarks): void {
             $award->update([
                 'disbursement_status' => $status,
@@ -92,6 +148,33 @@ class AwardService
                 $award->application->update(['status' => ApplicationStatus::DISBURSEMENT_CONFIRMED]);
             }
         });
+
+        $application = $award->application;
+
+        if ($status === DisbursementStatus::CONFIRMED) {
+            $this->notifications->notifyMany(
+                [$application->submitted_by_user_id ?? $application->student->user_id],
+                NotificationType::DISBURSEMENT_CONFIRMED,
+                [
+                    'scholarship' => $application->scholarship->title,
+                    'award' => $award->award_number,
+                ],
+                route('awards.index'),
+            );
+        }
+
+        $this->audit->record(
+            'award.disbursement',
+            sprintf(
+                'Disbursement for award %s moved to %s.%s',
+                $award->award_number,
+                $status->label(),
+                $remarks !== null ? ' '.$remarks : '',
+            ),
+            $award,
+            ['disbursement_status' => $previous->value],
+            ['disbursement_status' => $status->value],
+        );
 
         return $award->refresh();
     }

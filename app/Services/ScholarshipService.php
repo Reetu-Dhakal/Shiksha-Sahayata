@@ -11,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 
 class ScholarshipService
 {
+    public function __construct(private readonly AuditLogService $audit) {}
+
     /**
      * @param  array<string, mixed>  $data
      */
@@ -98,6 +100,14 @@ class ScholarshipService
         }
 
         $scholarship->update(['status' => $target]);
+
+        $this->audit->record(
+            'scholarship.status',
+            sprintf('Scholarship "%s" moved from %s to %s.', $scholarship->title, $current->label(), $target->label()),
+            $scholarship,
+            ['status' => $current->value],
+            ['status' => $target->value],
+        );
     }
 
     /**

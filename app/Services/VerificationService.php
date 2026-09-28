@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\NotificationType;
 use App\Enums\Role;
 use App\Enums\VerificationStage;
 use App\Enums\VerificationStatus;
@@ -15,6 +16,11 @@ use Illuminate\Validation\ValidationException;
 
 class VerificationService
 {
+    public function __construct(
+        private readonly NotificationService $notifications,
+        private readonly AuditLogService $audit,
+    ) {}
+
     public function stageFor(User $officer): VerificationStage
     {
         return match (true) {
@@ -140,6 +146,19 @@ class VerificationService
 
         $this->record($application, $stage, $officer, VerificationStatus::VERIFIED, $remarks);
 
+        $this->audit->record(
+            'verification.approve',
+            sprintf(
+                '%s verification approved for application #%d.',
+                $stage->label(),
+                $application->id,
+            ),
+            $application,
+            [],
+            ['status' => $application->status->value],
+            $officer,
+        );
+
         return $application;
     }
 
@@ -170,6 +189,33 @@ class VerificationService
         ]);
 
         $this->record($application, $stage, $officer, VerificationStatus::RETURNED, $remarks);
+
+        $params = [
+            'scholarship' => $application->scholarship->title,
+            'remarks' => $remarks,
+            'application' => (string) $application->id,
+        ];
+
+        $this->notifications->notifyMany(
+            [$application->submitted_by_user_id ?? $application->student->user_id],
+            NotificationType::APPLICATION_RETURNED,
+            $params,
+            route('applications.show', $application),
+        );
+
+        $this->audit->record(
+            'verification.return',
+            sprintf(
+                '%s verification returned application #%d for correction: %s',
+                $stage->label(),
+                $application->id,
+                $remarks,
+            ),
+            $application,
+            [],
+            ['status' => ApplicationStatus::RETURNED_FOR_CORRECTION->value, 'remarks' => $remarks],
+            $officer,
+        );
 
         return $application;
     }

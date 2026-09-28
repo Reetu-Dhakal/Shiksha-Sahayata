@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\AppealStatus;
 use App\Enums\ApplicationStatus;
+use App\Enums\NotificationType;
 use App\Enums\Role;
 use App\Models\Appeal;
 use App\Models\Application;
@@ -14,7 +15,11 @@ use Illuminate\Validation\ValidationException;
 
 class AppealService
 {
-    public function __construct(private readonly ApplicationService $applications) {}
+    public function __construct(
+        private readonly ApplicationService $applications,
+        private readonly NotificationService $notifications,
+        private readonly AuditLogService $audit,
+    ) {}
 
     public function canSubmit(User $actor, Application $application): bool
     {
@@ -41,7 +46,7 @@ class AppealService
             ]);
         }
 
-        return DB::transaction(function () use ($actor, $application, $reason): Appeal {
+        $appeal = DB::transaction(function () use ($actor, $application, $reason): Appeal {
             $appeal = Appeal::query()->create([
                 'application_id' => $application->id,
                 'appellant_user_id' => $actor->id,
@@ -54,6 +59,35 @@ class AppealService
 
             return $appeal;
         });
+
+        $params = [
+            'scholarship' => $application->scholarship->title,
+            'student' => $application->student->name,
+            'appeal' => (string) $appeal->id,
+        ];
+
+        $this->notifications->notifyMany(
+            $this->reviewerIds($application),
+            NotificationType::APPEAL_SUBMITTED,
+            $params,
+            route('appeals.index'),
+        );
+
+        $this->audit->record(
+            'appeal.submit',
+            sprintf(
+                'Appeal #%d submitted against application #%d: %s',
+                $appeal->id,
+                $application->id,
+                $reason,
+            ),
+            $appeal,
+            [],
+            ['application_id' => $application->id, 'reason' => $reason],
+            $actor,
+        );
+
+        return $appeal;
     }
 
     /**
@@ -133,6 +167,15 @@ class AppealService
             $application->update(['status' => ApplicationStatus::UNDER_REVIEW]);
         });
 
+        $this->audit->record(
+            'appeal.reopen',
+            sprintf('Appeal #%d reopened and application #%d returned to selection review.', $appeal->id, $application->id),
+            $appeal,
+            ['status' => AppealStatus::SUBMITTED->value],
+            ['status' => AppealStatus::UNDER_REVIEW->value],
+            $reviewer,
+        );
+
         return $appeal->refresh();
     }
 
@@ -167,6 +210,47 @@ class AppealService
             }
         });
 
+        $outcome = $approved ? AppealStatus::APPROVED : AppealStatus::REJECTED;
+
+        $params = [
+            'scholarship' => $application->scholarship->title,
+            'outcome' => $outcome->label(),
+            'remarks' => $remarks,
+            'appeal' => (string) $appeal->id,
+        ];
+
+        $this->notifications->notifyMany(
+            [$appeal->appellant_user_id],
+            NotificationType::APPEAL_DECIDED,
+            $params,
+            route('applications.show', $application),
+        );
+
+        $this->audit->record(
+            'appeal.decide',
+            sprintf('Appeal #%d decided as %s: %s', $appeal->id, $outcome->label(), $remarks),
+            $appeal,
+            ['status' => AppealStatus::UNDER_REVIEW->value],
+            ['status' => $outcome->value, 'remarks' => $remarks],
+            $reviewer,
+        );
+
         return $appeal->refresh();
+    }
+
+    /**
+     * Administrators plus the scholarship's assigned committee members.
+     *
+     * @return list<int>
+     */
+    private function reviewerIds(Application $application): array
+    {
+        $adminIds = User::query()->where('role', Role::ADMIN->value)->pluck('id');
+
+        return $adminIds
+            ->merge($application->scholarship->committeeMembers()->pluck('user_id'))
+            ->unique()
+            ->values()
+            ->all();
     }
 }

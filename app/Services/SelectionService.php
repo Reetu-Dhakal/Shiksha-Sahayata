@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\ApplicationStatus;
 use App\Enums\Decision;
+use App\Enums\NotificationType;
 use App\Enums\Role;
 use App\Models\Application;
 use App\Models\User;
@@ -13,6 +14,11 @@ use Illuminate\Validation\ValidationException;
 
 class SelectionService
 {
+    public function __construct(
+        private readonly NotificationService $notifications,
+        private readonly AuditLogService $audit,
+    ) {}
+
     /**
      * Applications this committee member may review, for their assigned scholarships.
      *
@@ -139,6 +145,39 @@ class SelectionService
             );
         });
 
+        $this->announceDecision($application, $decision, $reason, $committee);
+
         return $application->fresh()->load(['decision', 'scores.criterion']);
+    }
+
+    private function announceDecision(Application $application, Decision $decision, string $reason, User $committee): void
+    {
+        $params = [
+            'scholarship' => $application->scholarship->title,
+            'decision' => $decision->label(),
+            'reason' => $reason,
+            'application' => (string) $application->id,
+        ];
+
+        $this->notifications->notifyMany(
+            [$application->submitted_by_user_id ?? $application->student->user_id],
+            NotificationType::SELECTION_DECIDED,
+            $params,
+            route('applications.show', $application),
+        );
+
+        $this->audit->record(
+            'selection.decision',
+            sprintf(
+                'Selection committee recorded %s for application #%d: %s',
+                $decision->label(),
+                $application->id,
+                $reason,
+            ),
+            $application,
+            [],
+            ['decision' => $decision->value, 'reason' => $reason],
+            $committee,
+        );
     }
 }

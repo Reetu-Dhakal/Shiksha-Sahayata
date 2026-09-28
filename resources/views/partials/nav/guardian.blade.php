@@ -3,6 +3,7 @@
         ['route' => 'dashboard', 'label' => __('nav.dashboard')],
         ['route' => 'applications.index', 'label' => __('nav.applications')],
         ['route' => 'awards.index', 'label' => __('nav.awards')],
+        ['route' => 'notifications.index', 'label' => __('nav.notifications')],
         ['route' => 'guardian.profile.show', 'label' => __('nav.profile')],
     ];
 @endphp

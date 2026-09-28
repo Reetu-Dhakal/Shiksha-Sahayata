@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AwardController as AdminAwardController;
 use App\Http\Controllers\Admin\LocalEducationUnitController;
 use App\Http\Controllers\Admin\ScholarshipController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardianProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ScholarshipController as PublicScholarshipController;
 use App\Http\Controllers\SelectionController;
 use App\Http\Controllers\StudentProfileController;
@@ -94,6 +96,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{application}/decision', [SelectionController::class, 'decide'])->whereNumber('application')->name('decision');
     });
 
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
+        Route::post('/{notification}/read', [NotificationController::class, 'markRead'])->whereNumber('notification')->name('read');
+    });
+
     Route::middleware('role:student,guardian')->prefix('awards')->name('awards.')->group(function () {
         Route::get('/', [AwardController::class, 'index'])->name('index');
         Route::get('/{award}/letter', [AwardController::class, 'letter'])->whereNumber('award')->name('letter');
@@ -124,6 +132,8 @@ Route::middleware('auth')->group(function () {
         Route::post('awards/issue/{application}', [AdminAwardController::class, 'issue'])->whereNumber('application')->name('awards.issue');
         Route::patch('awards/{award}/disbursement', [AdminAwardController::class, 'updateDisbursement'])->whereNumber('award')->name('awards.disbursement');
         Route::patch('awards/{award}/revoke', [AdminAwardController::class, 'revoke'])->whereNumber('award')->name('awards.revoke');
+
+        Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
 
         Route::get('local-education-units', [LocalEducationUnitController::class, 'index'])->name('local-education-units.index');
         Route::get('local-education-units/create', [LocalEducationUnitController::class, 'create'])->name('local-education-units.create');

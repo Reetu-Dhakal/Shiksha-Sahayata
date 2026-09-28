@@ -6,6 +6,7 @@
         ['route' => 'admin.awards.index', 'label' => __('nav.awards')],
         ['route' => 'admin.schools.index', 'label' => __('nav.schools')],
         ['route' => 'admin.local-education-units.index', 'label' => __('nav.local_units')],
+        ['route' => 'admin.audit-logs.index', 'label' => __('nav.audit_logs')],
     ];
 @endphp
 

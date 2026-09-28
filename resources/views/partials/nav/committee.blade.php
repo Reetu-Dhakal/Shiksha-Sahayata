@@ -1,6 +1,7 @@
 @php
     $items = [
         ['route' => 'dashboard', 'label' => __('nav.dashboard')],
+        ['route' => 'selection.index', 'label' => __('nav.selection')],
     ];
 @endphp
 

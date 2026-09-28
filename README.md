@@ -305,5 +305,6 @@ Incremental build log (each phase committed and pushed with passing tests):
 | 6 | Applications: draft/edit/submit with deadline enforcement, duplicate prevention, guardian applications, status timeline and tracking | Done |
 | 7 | Private document upload/download with type/size validation, replace and delete, required documents enforced before submission | Done |
 | 8 | Two-stage verification: school and local education officer queues, jurisdiction scoping, approve/forward and return-for-correction with remarks | Done |
+| 9 | Selection: committee-scoped queues, weighted criterion scoring with live totals, reasoned SELECTED/WAITLISTED/REJECTED decisions | Done |
 
 Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

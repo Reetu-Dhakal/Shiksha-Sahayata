@@ -12,6 +12,7 @@ use App\Http\Controllers\GuardianProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ScholarshipController as PublicScholarshipController;
+use App\Http\Controllers\SelectionController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
@@ -76,6 +77,13 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{application}/start', [VerificationController::class, 'start'])->whereNumber('application')->name('start');
         Route::patch('/{application}/approve', [VerificationController::class, 'approve'])->whereNumber('application')->name('approve');
         Route::patch('/{application}/return', [VerificationController::class, 'returnForCorrection'])->whereNumber('application')->name('return');
+    });
+
+    Route::middleware('role:committee')->prefix('selection')->name('selection.')->group(function () {
+        Route::get('/', [SelectionController::class, 'index'])->name('index');
+        Route::get('/{application}', [SelectionController::class, 'show'])->whereNumber('application')->name('show');
+        Route::patch('/{application}/scores', [SelectionController::class, 'scores'])->whereNumber('application')->name('scores');
+        Route::patch('/{application}/decision', [SelectionController::class, 'decide'])->whereNumber('application')->name('decision');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

@@ -59,8 +59,7 @@
 @endif
 
 <section class="rounded border border-slate-200 bg-white p-4">
-    <h2 class="text-sm font-semibold text-slate-900">Status</h2>
-    <ol class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <h2 class="text-sm font-semibold text-slate-900">Status</h2>    <ol class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         @foreach ($timeline as $index => $stage)
             <li class="rounded border p-3
                 @if ($index < $currentIndex) border-green-200 bg-green-50
@@ -86,6 +85,25 @@
             {{ $application->scholarship->application_deadline->format('j M Y') }}.</p>
     @endif
 </section>
+
+@if ($application->decision)
+    <section class="mt-4 rounded border border-slate-200 bg-white p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-sm font-semibold text-slate-900">Selection decision</h2>
+            <x-status-badge :type="$application->decision->decision->badgeType()" :label="$application->decision->decision->label()" />
+        </div>
+        <p class="mt-2 text-sm leading-relaxed text-slate-700">{{ $application->decision->reason }}</p>
+        <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+            <span>
+                {{ $application->decision->decidedBy?->name ?: 'Selection committee' }}
+                @if ($application->decision->decided_at) · {{ $application->decision->decided_at->format('j M Y, H:i') }} @endif
+            </span>
+            @if ($application->scores->isNotEmpty())
+                <span>Weighted score: <strong class="text-slate-800">{{ number_format($application->weightedTotal(), 2) }}%</strong></span>
+            @endif
+        </div>
+    </section>
+@endif
 
 <div class="mt-6 grid gap-6 lg:grid-cols-3">
     <section class="rounded border border-slate-200 bg-white p-4 lg:col-span-2">

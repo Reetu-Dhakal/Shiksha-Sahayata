@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Application extends Model
 {
@@ -61,6 +62,27 @@ class Application extends Model
     public function verifications(): HasMany
     {
         return $this->hasMany(Verification::class);
+    }
+
+    public function scores(): HasMany
+    {
+        return $this->hasMany(CriterionScore::class);
+    }
+
+    public function decision(): HasOne
+    {
+        return $this->hasOne(SelectionDecision::class);
+    }
+
+    public function weightedTotal(): float
+    {
+        $total = 0.0;
+
+        foreach ($this->scores as $score) {
+            $total += $score->weightedValue();
+        }
+
+        return $total;
     }
 
     public function verificationFor(VerificationStage $stage): ?Verification

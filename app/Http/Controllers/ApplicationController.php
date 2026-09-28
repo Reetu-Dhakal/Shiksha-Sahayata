@@ -100,7 +100,7 @@ class ApplicationController extends Controller
     {
         $this->applications->assertCanActFor($request->user(), $application->student, $application->scholarship);
 
-        $application->load(['scholarship.criteria', 'student', 'documents']);
+        $application->load(['scholarship.criteria', 'student', 'documents', 'decision.decidedBy', 'scores.criterion']);
 
         return view('applications.show', [
             'application' => $application,

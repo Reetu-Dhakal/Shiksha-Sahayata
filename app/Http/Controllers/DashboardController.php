@@ -3,11 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Role;
+use App\Services\DashboardService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private readonly DashboardService $dashboard,
+        private readonly NotificationService $notifications,
+    ) {}
+
     public function show(Request $request): View
     {
         $user = $request->user();
@@ -23,7 +30,11 @@ class DashboardController extends Controller
 
         return view($view, [
             'nav' => $nav,
-            'notifications' => $user->unreadNotifications()->latest()->limit(5)->get(),
+            'dashboard' => $this->dashboard->forUser($user),
+            'notifications' => $this->notifications->forUser($user)
+                ->filter(fn ($notification): bool => $notification->isUnread())
+                ->take(5)
+                ->values(),
         ]);
     }
 }

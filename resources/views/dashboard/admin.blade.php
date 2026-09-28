@@ -8,34 +8,53 @@
     <p class="mt-1 text-sm text-slate-600">System-wide status based on live database records.</p>
 </div>
 
-<div class="grid gap-4 lg:grid-cols-3">
+<x-stat-cards :stats="$dashboard['stats']" />
+
+<div class="mt-6 grid gap-4 lg:grid-cols-2">
     <section class="rounded border border-slate-200 bg-white p-4">
-        <h2 class="text-sm font-semibold text-slate-900">Scholarships</h2>
-        <div class="mt-2">
-            <x-empty-state title="No scholarships yet" message="Create the first scholarship to get started.">
-                @if (Route::has('admin.scholarships.create'))
-                    <a href="{{ route('admin.scholarships.create') }}" class="rounded bg-blue-800 px-4 py-2 text-xs font-medium text-white hover:bg-blue-900">{{ __('nav.create_scholarship') }}</a>
-                @endif
-            </x-empty-state>
+        <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-900">Applications by status</h2>
+            @if (Route::has('admin.reports.index'))
+                <a href="{{ route('admin.reports.index') }}" class="text-xs font-medium text-blue-800 hover:underline">{{ __('nav.reports') }}</a>
+            @endif
         </div>
+
+        @if ($dashboard['byStatus']->isEmpty())
+            <x-empty-state title="No applications yet" message="Applications will be counted here as soon as students apply." />
+        @else
+            <ul class="mt-3 divide-y divide-slate-100 text-sm">
+                @foreach ($dashboard['byStatus'] as $label => $count)
+                    <li class="flex items-center justify-between py-2">
+                        <span class="text-slate-600">{{ $label }}</span>
+                        <span class="font-medium text-slate-900">{{ $count }}</span>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
     </section>
 
     <section class="rounded border border-slate-200 bg-white p-4">
-        <h2 class="text-sm font-semibold text-slate-900">Applications</h2>
-        <div class="mt-2">
-            <x-empty-state title="No applications yet" message="Applications, verifications and selections will appear here." />
+        <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-900">Recent activity</h2>
+            @if (Route::has('admin.audit-logs.index'))
+                <a href="{{ route('admin.audit-logs.index') }}" class="text-xs font-medium text-blue-800 hover:underline">{{ __('nav.audit_logs') }}</a>
+            @endif
         </div>
-    </section>
 
-    <section class="rounded border border-slate-200 bg-white p-4">
-        <h2 class="text-sm font-semibold text-slate-900">Users</h2>
-        <div class="mt-2">
-            <x-empty-state title="Manage the system" message="Create schools, local education units, officers and committee members.">
-                @if (Route::has('admin.users.index'))
-                    <a href="{{ route('admin.users.index') }}" class="rounded border border-slate-300 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">{{ __('nav.users') }}</a>
-                @endif
-            </x-empty-state>
-        </div>
+        @if ($dashboard['recent']->isEmpty())
+            <x-empty-state title="No activity yet" message="State changes recorded by the workflow will appear here." />
+        @else
+            <ul class="mt-3 divide-y divide-slate-100 text-sm">
+                @foreach ($dashboard['recent'] as $log)
+                    <li class="py-2">
+                        <p class="text-slate-700">{{ $log->description }}</p>
+                        <p class="mt-0.5 text-xs text-slate-400">
+                            {{ $log->actor?->name ?? 'System' }} · {{ $log->created_at->format('j M Y, H:i') }}
+                        </p>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
     </section>
 </div>
 @endsection

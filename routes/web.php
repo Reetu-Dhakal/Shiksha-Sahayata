@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AwardController as AdminAwardController;
 use App\Http\Controllers\Admin\LocalEducationUnitController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\AppealController;
@@ -134,6 +135,9 @@ Route::middleware('auth')->group(function () {
         Route::patch('awards/{award}/revoke', [AdminAwardController::class, 'revoke'])->whereNumber('award')->name('awards.revoke');
 
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+
+        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/applications.csv', [ReportController::class, 'applicationsCsv'])->name('reports.applications-csv');
 
         Route::get('local-education-units', [LocalEducationUnitController::class, 'index'])->name('local-education-units.index');
         Route::get('local-education-units/create', [LocalEducationUnitController::class, 'create'])->name('local-education-units.create');

@@ -8,7 +8,9 @@
     <p class="mt-1 text-sm text-slate-600">Your profile, potentially suitable scholarships, applications and awards.</p>
 </div>
 
-<div class="grid gap-4 lg:grid-cols-2">
+<x-stat-cards :stats="$dashboard['stats']" />
+
+<div class="mt-6 grid gap-4 lg:grid-cols-2">
     <section class="rounded border border-slate-200 bg-white p-4">
         <h2 class="text-sm font-semibold text-slate-900">{{ auth()->user()->role === \App\Enums\Role::GUARDIAN ? 'Guardian profile' : 'Student profile' }}</h2>
         @if (auth()->user()->role === \App\Enums\Role::GUARDIAN)
@@ -43,13 +45,34 @@
     </section>
 
     <section class="rounded border border-slate-200 bg-white p-4">
-        <h2 class="text-sm font-semibold text-slate-900">My applications</h2>
+        <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-900">My applications</h2>
+            <a href="{{ route('applications.index') }}" class="text-xs font-medium text-blue-800 hover:underline">{{ __('nav.applications') }}</a>
+        </div>
         <div class="mt-2">
-            <x-empty-state title="No applications yet" message="Once you apply for a scholarship, its progress will appear here.">
-                @if (Route::has('scholarships.index'))
-                    <a href="{{ route('scholarships.index') }}" class="rounded border border-slate-300 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">{{ __('nav.browse') }}</a>
-                @endif
-            </x-empty-state>
+            @if ($dashboard['rows']->isEmpty())
+                <x-empty-state title="No applications yet" message="Once you apply for a scholarship, its progress will appear here.">
+                    @if (Route::has('scholarships.index'))
+                        <a href="{{ route('scholarships.index') }}" class="rounded border border-slate-300 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">{{ __('nav.browse') }}</a>
+                    @endif
+                </x-empty-state>
+            @else
+                <ul class="divide-y divide-slate-100 text-sm">
+                    @foreach ($dashboard['rows'] as $application)
+                        <li class="flex items-center justify-between gap-3 py-2">
+                            <div class="min-w-0">
+                                <a href="{{ route('applications.show', $application) }}" class="block truncate font-medium text-slate-800 hover:text-blue-800">
+                                    {{ $application->scholarship->title }}
+                                </a>
+                                <p class="text-xs text-slate-500">
+                                    {{ $application->submitted_at?->format('j M Y') ?? 'Draft' }}
+                                </p>
+                            </div>
+                            <x-status-badge :type="$application->status->badgeType()" :label="$application->status->label()" />
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
         </div>
     </section>
 
@@ -62,8 +85,9 @@
         <div class="mt-2">
             @forelse ($notifications as $notification)
                 <div class="border-b border-slate-100 py-2 last:border-0">
-                    <p class="text-sm text-slate-700">{{ $notification->data['message'] ?? $notification->type }}</p>
-                    <p class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</p>
+                    <p class="text-sm font-medium text-slate-800">{{ $notification->title() }}</p>
+                    <p class="mt-0.5 text-sm text-slate-600">{{ $notification->body() }}</p>
+                    <p class="mt-0.5 text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</p>
                 </div>
             @empty
                 <p class="py-3 text-sm text-slate-500">{{ __('common.no_records') }}</p>

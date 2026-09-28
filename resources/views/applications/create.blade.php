@@ -5,12 +5,16 @@
 @section('content')
 <div class="mb-6">
     <nav class="text-xs text-slate-500">
-        <a href="{{ route('applications.index') }}" class="hover:text-blue-800">My applications</a>
+        <a href="{{ route('applications.index') }}" class="hover:text-blue-800">{{ $assisted ? __('nav.assisted_applications') : 'My applications' }}</a>
         <span class="mx-1">/</span>
         <span>New application</span>
     </nav>
-    <h1 class="mt-2 text-lg font-semibold text-slate-900">New scholarship application</h1>
-    <p class="mt-1 text-sm text-slate-600">Create a draft first — you can review it before submitting.</p>
+    <h1 class="mt-2 text-lg font-semibold text-slate-900">{{ $assisted ? 'New assisted application' : 'New scholarship application' }}</h1>
+    <p class="mt-1 text-sm text-slate-600">
+        {{ $assisted
+            ? 'Fill this application for a student in your jurisdiction. It will be marked as an assisted application.'
+            : 'Create a draft first — you can review it before submitting.' }}
+    </p>
 </div>
 
 @if ($scholarships->isEmpty())
@@ -38,7 +42,7 @@
 
             @if ($siblings->count() > 1)
                 <div class="mt-4">
-                    <label for="student" class="mb-1 block text-sm font-medium text-slate-700">Applying for</label>
+                    <label for="student" class="mb-1 block text-sm font-medium text-slate-700">{{ $assisted ? 'Student' : 'Applying for' }}</label>
                     <select id="student" name="student_id"
                             class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
                         @foreach ($siblings as $sibling)

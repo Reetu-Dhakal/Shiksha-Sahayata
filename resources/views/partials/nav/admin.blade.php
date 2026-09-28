@@ -3,6 +3,7 @@
         ['route' => 'dashboard', 'label' => __('nav.dashboard')],
         ['route' => 'admin.scholarships.index', 'label' => __('nav.scholarships')],
         ['route' => 'appeals.index', 'label' => __('nav.appeals')],
+        ['route' => 'applications.index', 'label' => __('nav.assisted_applications')],
         ['route' => 'admin.awards.index', 'label' => __('nav.awards')],
         ['route' => 'admin.schools.index', 'label' => __('nav.schools')],
         ['route' => 'admin.local-education-units.index', 'label' => __('nav.local_units')],

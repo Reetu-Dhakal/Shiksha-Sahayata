@@ -1,21 +1,31 @@
 @extends('layouts.app')
 
-@section('title', 'My applications')
+@section('title', $assisted ? __('nav.assisted_applications') : 'My applications')
 
 @section('content')
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-        <h1 class="text-lg font-semibold text-slate-900">My applications</h1>
-        <p class="mt-1 text-sm text-slate-600">Track every application from submission through verification and selection.</p>
+        <h1 class="text-lg font-semibold text-slate-900">{{ $assisted ? __('nav.assisted_applications') : 'My applications' }}</h1>
+        <p class="mt-1 text-sm text-slate-600">
+            {{ $assisted
+                ? 'Applications you filled in on behalf of students in your jurisdiction. They keep full access to their own application.'
+                : 'Track every application from submission through verification and selection.' }}
+        </p>
     </div>
     <a href="{{ route('applications.create') }}" class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900">
-        Apply for a scholarship
+        {{ $assisted ? 'New assisted application' : 'Apply for a scholarship' }}
     </a>
 </div>
 
 @if ($applications->isEmpty())
-    <x-empty-state title="No applications yet" message="Browse open scholarships and submit your first application.">
-        <a href="{{ route('scholarships.index') }}" class="text-sm font-medium text-blue-800 hover:underline">Browse scholarships</a>
+    <x-empty-state
+        :title="$assisted ? 'No assisted applications yet' : 'No applications yet'"
+        :message="$assisted
+            ? 'Fill an application on behalf of a student in your jurisdiction and it will appear here.'
+            : 'Browse open scholarships and submit your first application.'">
+        @unless ($assisted)
+            <a href="{{ route('scholarships.index') }}" class="text-sm font-medium text-blue-800 hover:underline">Browse scholarships</a>
+        @endunless
     </x-empty-state>
 @else
     <div class="space-y-3">

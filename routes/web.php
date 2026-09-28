@@ -59,7 +59,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/students', [GuardianProfileController::class, 'linkStudent'])->name('students.link');
     });
 
-    Route::middleware('role:student,guardian')->prefix('applications')->name('applications.')->group(function () {
+    Route::middleware('role:student,guardian,admin,school_officer,local_officer')->prefix('applications')->name('applications.')->group(function () {
         Route::get('/', [ApplicationController::class, 'index'])->name('index');
         Route::get('/create', [ApplicationController::class, 'create'])->name('create');
         Route::post('/', [ApplicationController::class, 'store'])->name('store');

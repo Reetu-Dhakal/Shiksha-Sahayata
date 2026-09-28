@@ -301,7 +301,7 @@ class ApplicationTest extends TestCase
             ->assertSee('Open Scholarship');
     }
 
-    public function test_school_officer_cannot_access_applicant_routes(): void
+    public function test_school_officer_can_fill_an_assisted_application(): void
     {
         [, $student] = $this->student();
         $scholarship = $this->scholarship();
@@ -310,13 +310,17 @@ class ApplicationTest extends TestCase
         $this->actingAs($officer)->post('/applications', [
             'scholarship_id' => $scholarship->id,
             'student_id' => $student->id,
-        ] + $this->validStatement())->assertForbidden();
+        ] + $this->validStatement())->assertSessionHasNoErrors()->assertRedirect();
+
+        $application = Application::query()->firstOrFail();
+        $this->assertSame($student->id, $application->student_id);
+        $this->assertTrue($application->is_assisted);
     }
 
-    public function test_admin_dashboard_role_cannot_access_applicant_routes(): void
+    public function test_admin_can_open_the_assisted_applications_index(): void
     {
         $admin = User::factory()->admin()->create();
 
-        $this->actingAs($admin)->get('/applications')->assertForbidden();
+        $this->actingAs($admin)->get('/applications')->assertOk();
     }
 }

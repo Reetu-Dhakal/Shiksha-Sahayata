@@ -10,6 +10,7 @@ use App\Models\Scholarship;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\ApplicationService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -22,15 +23,22 @@ class ApplicationController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        $studentIds = $this->studentIdsFor($user);
+        $assisted = ! $user->isApplicant();
+
+        $query = Application::query()
+            ->with(['scholarship', 'student'])
+            ->orderByDesc('created_at');
+
+        if ($assisted) {
+            $query->where('is_assisted', true)
+                ->whereHas('student', fn (Builder $student) => $this->scopeStudents($student, $user));
+        } else {
+            $query->whereIn('student_id', $this->studentIdsFor($user));
+        }
 
         return view('applications.index', [
-            'applications' => Application::query()
-                ->with(['scholarship', 'student'])
-                ->whereIn('student_id', $studentIds)
-                ->orderByDesc('created_at')
-                ->paginate(10)
-                ->withQueryString(),
+            'applications' => $query->paginate(10)->withQueryString(),
+            'assisted' => $assisted,
         ]);
     }
 
@@ -62,6 +70,7 @@ class ApplicationController extends Controller
                 'scholarships' => $scholarships,
                 'scholarship' => null,
                 'siblings' => $this->studentsFor($user),
+                'assisted' => ! $user->isApplicant(),
             ]);
         }
 
@@ -70,6 +79,7 @@ class ApplicationController extends Controller
             'scholarships' => $scholarships,
             'scholarship' => $scholarship,
             'siblings' => $this->studentsFor($user),
+            'assisted' => ! $user->isApplicant(),
         ]);
     }
 
@@ -177,6 +187,8 @@ class ApplicationController extends Controller
     }
 
     /**
+     * Students this account may fill applications for.
+     *
      * @return Collection<int, Student>
      */
     private function studentsFor(User $user): Collection
@@ -192,7 +204,48 @@ class ApplicationController extends Controller
             return collect([$user->student]);
         }
 
+        if ($user->isAdmin()) {
+            return Student::query()->orderBy('name')->get();
+        }
+
+        if ($user->hasRole(Role::SCHOOL_OFFICER)) {
+            return Student::query()
+                ->where('school_id', $user->school_id)
+                ->orderBy('name')
+                ->get();
+        }
+
+        if ($user->hasRole(Role::LOCAL_OFFICER)) {
+            $unit = $user->localEducationUnit;
+
+            return Student::query()
+                ->where('district', $unit?->district)
+                ->where('municipality', $unit?->municipality)
+                ->orderBy('name')
+                ->get();
+        }
+
         return collect();
+    }
+
+    /**
+     * Restrict a student query to the officer's jurisdiction.
+     */
+    private function scopeStudents(Builder $query, User $user): Builder
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        if ($user->hasRole(Role::SCHOOL_OFFICER)) {
+            return $query->where('school_id', $user->school_id);
+        }
+
+        $unit = $user->localEducationUnit;
+
+        return $query
+            ->where('district', $unit?->district)
+            ->where('municipality', $unit?->municipality);
     }
 
     private function resolveStudent(User $user, ?int $requestedId): Student|RedirectResponse
@@ -231,6 +284,28 @@ class ApplicationController extends Controller
             return $student;
         }
 
-        abort(403, 'Only students and guardians can submit applications.');
+        if ($user->isApplicant()) {
+            abort(403, 'Only students and guardians can submit applications.');
+        }
+
+        $students = $this->studentsFor($user);
+
+        if ($students->isEmpty()) {
+            return redirect()
+                ->route('applications.index')
+                ->withErrors(['student_id' => 'No student profiles are available in your jurisdiction.']);
+        }
+
+        $student = $requestedId !== null
+            ? $students->firstWhere('id', $requestedId)
+            : $students->first();
+
+        if ($student === null) {
+            return redirect()
+                ->route('applications.index')
+                ->withErrors(['student_id' => 'Select a student profile within your jurisdiction.']);
+        }
+
+        return $student;
     }
 }

@@ -309,5 +309,6 @@ Incremental build log (each phase committed and pushed with passing tests):
 | 10 | Appeals: one appeal per rejection, reopen back into selection review, reasoned approve/reject outcomes visible to the applicant | Done |
 | 11 | Awards: issue numbered awards with QR verification codes, step-by-step disbursement tracking, revocation, PDF award letter, public verification page | Done |
 | 12 | Notifications and audit trail: workflow events notify the right actors, every state change is recorded with actor, subject and IP | Done |
+| 13 | Assisted applications: school/local officers and admins fill applications on behalf of students inside their jurisdiction, flagged as assisted | Done |
 
 Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

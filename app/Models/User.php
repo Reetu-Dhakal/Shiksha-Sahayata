@@ -60,7 +60,9 @@ class User extends Authenticatable
     public function hasRole(Role|string ...$roles): bool
     {
         foreach ($roles as $role) {
-            if ($this->role === ($role instanceof Role ? $role->value : $role)) {
+            $value = $role instanceof Role ? $role->value : $role;
+
+            if ($this->role->value === $value) {
                 return true;
             }
         }

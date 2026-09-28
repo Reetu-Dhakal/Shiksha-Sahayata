@@ -75,4 +75,15 @@ class AuthorizationTest extends TestCase
         $this->assertTrue(Role::STUDENT->isApplicant());
         $this->assertFalse(Role::ADMIN->isApplicant());
     }
+
+    public function test_has_role_accepts_enum_and_string_values(): void
+    {
+        $student = User::factory()->create(['role' => Role::STUDENT]);
+
+        $this->assertTrue($student->hasRole(Role::STUDENT));
+        $this->assertTrue($student->hasRole('student'));
+        $this->assertTrue($student->hasRole(Role::ADMIN, Role::STUDENT));
+        $this->assertFalse($student->hasRole(Role::ADMIN));
+        $this->assertFalse($student->hasRole('admin'));
+    }
 }

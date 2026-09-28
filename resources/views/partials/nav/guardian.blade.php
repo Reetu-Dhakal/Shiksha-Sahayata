@@ -1,6 +1,7 @@
 @php
     $items = [
         ['route' => 'dashboard', 'label' => __('nav.dashboard')],
+        ['route' => 'applications.index', 'label' => __('nav.applications')],
         ['route' => 'guardian.profile.show', 'label' => __('nav.profile')],
     ];
 @endphp

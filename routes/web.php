@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\LocalEducationUnitController;
 use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
@@ -44,6 +45,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/profile', [GuardianProfileController::class, 'store'])->name('profile.store');
         Route::put('/profile', [GuardianProfileController::class, 'update'])->name('profile.update');
         Route::post('/students', [GuardianProfileController::class, 'linkStudent'])->name('students.link');
+    });
+
+    Route::middleware('role:student,guardian')->prefix('applications')->name('applications.')->group(function () {
+        Route::get('/', [ApplicationController::class, 'index'])->name('index');
+        Route::get('/create', [ApplicationController::class, 'create'])->name('create');
+        Route::post('/', [ApplicationController::class, 'store'])->name('store');
+        Route::get('/{application}', [ApplicationController::class, 'show'])->whereNumber('application')->name('show');
+        Route::get('/{application}/edit', [ApplicationController::class, 'edit'])->whereNumber('application')->name('edit');
+        Route::put('/{application}', [ApplicationController::class, 'update'])->whereNumber('application')->name('update');
+        Route::patch('/{application}/submit', [ApplicationController::class, 'submit'])->whereNumber('application')->name('submit');
+        Route::delete('/{application}', [ApplicationController::class, 'destroy'])->whereNumber('application')->name('destroy');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

@@ -302,5 +302,6 @@ Incremental build log (each phase committed and pushed with passing tests):
 | 3 | Schools, local education units, guardians, students, Scholar Student ID generation, profile management, admin school/LEU CRUD | Done |
 | 4 | Scholarship management: drafts, eligibility rules, weighted criteria, required documents, committee assignment, publishing preconditions | Done |
 | 5 | Public scholarship discovery: listing with keyword/level/open filters, detail page with criteria, rules, documents and timeline | Done |
+| 6 | Applications: draft/edit/submit with deadline enforcement, duplicate prevention, guardian applications, status timeline and tracking | Done |
 
 Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

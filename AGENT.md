@@ -49,8 +49,9 @@ National ID / IEMIS / civil registration integrations, biometric or facial recog
 ## Technology
 
 - PHP 8.2+, **Laravel 12** monolith, Eloquent.
-- Blade + **Tailwind CSS 4** (Vite plugin) + **Alpine.js** + Chart.js (dashboards only where useful).
+- Blade + **Tailwind CSS 4** (Vite plugin) + **Alpine.js** for small UI interactions (no chart library).
 - MySQL (dev: MariaDB 10.4 via XAMPP, DB `shiksha_sahayata`, user `root`, empty password).
+- PHP **GD extension is required** (award letter QR codes are rendered as PNG).
 - `barryvdh/laravel-dompdf` (award letter PDF), `endroid/qr-code` (QR codes).
 - PHPUnit 11 feature/unit tests. Vite build (`npm run build`).
 
@@ -61,49 +62,51 @@ One app + one database. No new frameworks/packages without approval.
 ## Architecture
 
 ```text
-Routes → Middleware (auth/role/jurisdiction) → Policies → Controllers (thin)
-      → Form Requests → Services → Eloquent → MySQL
+Routes → Middleware (auth + role) → Controllers (thin)
+      → Form Requests → Services (authorization + status transitions) → Eloquent → MySQL
 ```
 
-Services (only where logic is real, avoid file bloat): `ApplicationService`, `EligibilityService`, `VerificationService`, `SelectionService`, `AppealService`, `AwardService`, `NotificationService`, `AuditService`.
+Services (only where logic is real, avoid file bloat): `ScholarshipService`, `ApplicationService`, `VerificationService`, `SelectionService`, `AppealService`, `AwardService`, `NotificationService`, `AuditLogService`, `DashboardService`, `StudentService`.
 
-Enums in `app/Enums` define roles, statuses and the **single source of truth** for allowed status transitions. Never change an application status with a direct ad-hoc `update(['status' => ...])`; go through the transition API.
+There are **no Policies/Gate classes**: authorization lives in the `role` middleware plus the service methods (`canActFor`, `canReview`, `canView`, `inJurisdiction`, …). Enums in `app/Enums` define roles and statuses; `ApplicationStatus::transitions()` plus the service checks are the **single source of truth** for allowed status transitions. Never change an application status with a direct ad-hoc `update(['status' => ...])`; go through the owning service.
 
 ---
 
 ## Folder Structure
 
 ```text
-app/Enums/                     Role, ApplicationStatus, VerificationStatus, Decision, AppealStatus, DisbursementStatus...
-app/Http/Controllers/          Public, Auth, Dashboard, Scholarship, Application, Verification,
-                               Selection, Appeal, Award, Notification, Admin, Document, Verify
-app/Http/Middleware/           Role + jurisdiction checks
+app/Enums/                     Role, ApplicationStatus, ScholarshipStatus, VerificationStage/Status, Decision,
+                               AppealStatus, AwardStatus, DisbursementStatus, NotificationType, DocumentType...
+app/Http/Controllers/          Auth, Dashboard, Public Scholarship, Application(+Document), Verification,
+                               Selection, Appeal, Award, AwardVerification, Notification, Profile, Locale
+app/Http/Controllers/Admin/    Scholarship, School, LocalEducationUnit, Award, AuditLog, Report
+app/Http/Middleware/           CheckRole (comma-separated roles) + SetLocale
 app/Http/Requests/             Form Request validation per write action
 app/Models/                    User, Guardian, Student, School, LocalEducationUnit, Scholarship,
-                               ScholarshipCriterion, EligibilityRule, RequiredDocument, Application,
-                               ApplicationDocument, Verification, CriterionScore, SelectionDecision,
-                               Appeal, Award, AuditLog
-app/Policies/                  Application, Scholarship, Document, Appeal, Award, Student, Audit...
-app/Services/                  Business logic
-app/Notifications/             Database notifications
+                               ScholarshipCriterion, EligibilityRule, RequiredDocument, ScholarshipCommittee,
+                               Application, ApplicationDocument, Verification, CriterionScore, SelectionDecision,
+                               Appeal, Award, Notification, AuditLog
+app/Services/                  Business logic (see Architecture above)
 database/migrations|seeders    Schema + fictional demo data
-resources/views/               layouts, components, public pages, role dashboards
+resources/views/               layouts, components, public pages, role dashboards, partials/nav
 routes/web.php                 Public + auth + role-grouped routes
-tests/Feature|Unit             Required test coverage
+tests/Feature                  Feature tests for every phase
 ```
 
 ---
 
 ## Roles & Permissions
 
-| Role (`users.role`) | Jurisdiction | Notes |
+Role values in `users.role` are **lowercase strings** (`App\Enums\Role` cases are uppercase):
+
+| Role value | Jurisdiction | Notes |
 |---|---|---|
-| `ADMIN` | system | Manages everything, reports, audit logs. |
-| `STUDENT` | own profile/applications | The student applicant account. |
-| `GUARDIAN` | linked students (`students.guardian_id`) | Guardian account; shares the student/guardian dashboard. |
-| `SCHOOL_OFFICER` | own `users.school_id` | Verification for that school's applications only. |
-| `LOCAL_OFFICER` | own `users.local_education_unit_id` | Verification within that LEU only. |
-| `COMMITTEE` | scholarships they are assigned to (`scholarship_committee`) | Reviews/decides only after both verifications pass. |
+| `admin` | system | Manages everything, reports, audit logs. |
+| `student` | own profile/applications | The student applicant account. |
+| `guardian` | linked students (`students.guardian_id`) | Guardian account; shares the student/guardian dashboard. |
+| `school_officer` | own `users.school_id` | Verification for that school's applications only. |
+| `local_officer` | own `users.local_education_unit_id` | Verification within that LEU only. |
+| `committee` | scholarships they are assigned to (`scholarship_committee`) | Reviews/decides only after both verifications pass. |
 
 - Officers may also create **ASSISTED** applications for students of their jurisdiction.
 - Ordinary users can never act as officials. All checks are server-side.
@@ -122,8 +125,8 @@ applications 1—* criterion_scores *— scholarship_criteria
 applications 1—* selection_decisions *— users (committee member)
 applications 1—* appeals
 applications 1—0..1 awards
-users 1—* audit_logs (append-only)
-users 1—* notifications (Laravel database notifications)
+users 1—* audit_logs (append-only, table `audit_logs`)
+users 1—* user_notifications (custom `Notification` model: type, params, link, read_at)
 ```
 
 - `applications` unique key `(student_id, scholarship_id)` — duplicate prevention.
@@ -169,7 +172,7 @@ Two stages, each with `PENDING | VERIFIED | RETURNED | REJECTED`, verifier, rema
 
 - `scholarship_criteria` per scholarship: name, `weight`, `maximum_score`, order. Example weights are **examples only**, not government rules.
 - Committee enters a score per criterion; weighted total = `Σ (score / maximum_score × weight)`.
-- Stored in `criterion_scores` + `application.total_score`; decision rows in `selection_decisions` (member, decision, score_at_decision, reason, decided_at).
+- Stored in `criterion_scores` (score, scorer, notes); the weighted total is computed on the fly by `Application::weightedTotal()` — there is no stored total column. Decisions are single rows in `selection_decisions` (`application_id` unique, decision, member, reason, decided_at).
 - **The system calculates; humans decide.** Any override of the calculated score/recommendation requires a reason. Applicant sees decision + reason.
 
 ---
@@ -188,14 +191,16 @@ Only `REJECTED` applications show an appeal option. `appeals`: reason, optional 
 
 ## Notifications
 
-Laravel **database** notifications only (no SMS/mail providers). Events: scholarship published (to potentially suitable profiles: *"may match your profile"* — never *"you are eligible"*), submission, return for correction, each verification, review, selected/waitlisted/rejected, appeal submitted/decision, award generated.
+In-app notifications only (no SMS/mail providers). Rows live in `user_notifications` with a `type` (`App\Enums\NotificationType`), a `params` JSON payload, an optional `link` and `read_at`. Titles/bodies are rendered **at view time** from `lang/{en,np}/notification.php`, so the language follows the reader, not the writer.
+
+Wired events: application submitted (→ school officers, admins), returned for correction (→ submitter), selection decision (→ submitter), appeal submitted (→ committee + admins), appeal decided (→ appellant), award issued / revoked / disbursement confirmed (→ submitter). `NotificationController` lists them and supports mark-one/mark-all as read; the student dashboard shows the latest unread ones.
 
 ---
 
 ## Security & Privacy
 
 - bcrypt passwords; CSRF; Form Requests; rate-limited login; HTTPS-ready config.
-- Policies/Gates + middleware for every decision; never trust client-side roles.
+- Middleware (`role`, `CheckRole`) + service-level checks for every decision; never trust client-side roles.
 - Private document storage + authorized download route (validate mime/size/ownership).
 - Students see only their own data; school officers only their school; local officers only their LEU; committee only assigned scholarships & selection-relevant fields.
 - Sensitive fields never in public routes or logs. No secrets in git. Audit logs are append-only (no user edit/delete).
@@ -211,8 +216,11 @@ Laravel **database** notifications only (no SMS/mail providers). Events: scholar
 - Selection: weighted scoring math; committee authorization; decision recording.
 - Appeals: eligibility, ownership, status workflow.
 - Awards: generation, unique code, QR route, public page leaks no sensitive data.
+- Notifications/audit: correct recipients, mark-as-read, append-only audit rows with actor + subject.
+- Assisted applications: officer jurisdiction enforced; applicants cannot see other students' rows.
+- Dashboards/reports: live aggregates, admin-only reports + CSV export.
 
-Run: `php artisan test`.
+Run: `php artisan test` (feature tests, in-memory SQLite), then `vendor/bin/pint` and `php artisan migrate:fresh --seed` against MySQL before committing.
 
 ---
 

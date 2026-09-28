@@ -57,7 +57,7 @@ Administratively, scholarship processing requires coordination between students,
 - Digital award letter (PDF) with QR code and public verification page.
 - Disbursement status tracking (administrative only — no real payments).
 - Immutable audit log of important actions.
-- Role-specific dashboards built from real database data (Chart.js only where useful).
+- Role-specific dashboards built from real database data (never fake statistics).
 
 ---
 
@@ -71,7 +71,7 @@ Administratively, scholarship processing requires coordination between students,
 | **Selection Committee Member** | Review verified applications, view/calculcate scores, record SELECTED / WAITLISTED / REJECTED with reasons. |
 | **Administrator** | Manage users, schools, local units, scholarships, criteria, documents, publishing, committee members, reports, audit logs, settings. |
 
-All authorization is enforced server-side (middleware + policies). Client-side role claims are never trusted.
+All authorization is enforced server-side (role middleware + service-level jurisdiction checks). Client-side role claims are never trusted.
 
 ---
 
@@ -100,9 +100,9 @@ Invalid transitions (e.g. `DRAFT → AWARDED`) are rejected server-side.
 | Layer | Technology |
 |-------|------------|
 | Backend | PHP 8.2+, Laravel 12 (monolith), Eloquent ORM |
-| Frontend | Laravel Blade, Tailwind CSS 4, Alpine.js, Chart.js |
+| Frontend | Laravel Blade, Tailwind CSS 4, Alpine.js |
 | Database | MySQL 8+ (developed against MariaDB 10.4 via XAMPP) |
-| Libraries | barryvdh/laravel-dompdf (award letter), endroid/qr-code (QR verification) |
+| Libraries | barryvdh/laravel-dompdf (award letter), endroid/qr-code (QR verification, needs the PHP **GD** extension) |
 | Testing | PHPUnit 11 / Laravel Feature Tests |
 | Build | Vite, npm |
 
@@ -117,13 +117,14 @@ Browser
   ↓
 Laravel Routes (web.php)
   ↓
-Auth / Middleware (role, jurisdiction) / Policies & Gates
+Auth / Middleware (auth, role, locale) / service-level authorization
   ↓
 Controllers (thin)
   ↓
 Form Requests (validation)
   ↓
-Services (Application, Eligibility, Verification, Selection, Appeal, Award, Notification, Audit)
+Services (Scholarship, Application, Verification, Selection, Appeal,
+          Award, Notification, AuditLog, Dashboard)
   ↓
 Eloquent Models
   ↓
@@ -138,8 +139,8 @@ Core tables: `users`, `guardians`, `students`, `schools`, `local_education_units
 `scholarships`, `scholarship_criteria`, `scholarship_eligibility_rules`,
 `scholarship_documents`, `scholarship_committee`, `applications`,
 `application_documents`, `verifications`, `criterion_scores`,
-`selection_decisions`, `appeals`, `awards`, `audit_logs`, plus Laravel's
-`notifications`, `sessions`, `cache`, `jobs`.
+`selection_decisions`, `appeals`, `awards`, `user_notifications`,
+`audit_logs`, plus framework tables (`sessions`, `cache`, `jobs`).
 
 See `AGENT.md` for entity relationships.
 
@@ -233,14 +234,14 @@ All seeded accounts use the password `password`. **All seed data is fictional.**
 
 ```text
 app/
- ├── Http/Controllers/      # Thin HTTP layer, grouped by domain
+ ├── Http/Controllers/      # Thin HTTP layer (public + Admin/)
+ ├── Http/Middleware/        # Role + locale middleware
  ├── Http/Requests/         # Form Request validation
  ├── Models/                # Eloquent models
- ├── Policies/              # Authorization policies
- ├── Services/              # Application, Eligibility, Verification,
- │                          # Selection, Appeal, Award, Notification, Audit
- ├── Enums/                 # Roles, statuses, transitions
- ├── Notifications/         # Laravel database notifications
+ ├── Services/              # Scholarship, Application, Verification,
+ │                          # Selection, Appeal, Award, Notification,
+ │                          # AuditLog, Dashboard, Student
+ ├── Enums/                 # Roles, statuses, transitions, notification types
 database/
  ├── migrations/            # Schema with FKs, indexes, constraints
  ├── seeders/               # Fictional demo data
@@ -256,7 +257,7 @@ tests/Feature, tests/Unit   # PHPUnit tests
 
 - Hashed passwords (bcrypt), CSRF protection, session security, rate-limited login.
 - Form Request validation for every write endpoint.
-- Policies/middleware for every authorization decision (role **and** jurisdiction).
+- Middleware (`role`) plus service-level checks for every authorization decision (role **and** jurisdiction).
 - Documents stored privately; downloads go through an authorized route.
 - Sensitive fields (birth registration, citizenship, phone, documents) are never shown on public pages.
 - Public award verification exposes only: award number, scholarship name, limited student identity, issue date, status.
@@ -311,5 +312,6 @@ Incremental build log (each phase committed and pushed with passing tests):
 | 12 | Notifications and audit trail: workflow events notify the right actors, every state change is recorded with actor, subject and IP | Done |
 | 13 | Assisted applications: school/local officers and admins fill applications on behalf of students inside their jurisdiction, flagged as assisted | Done |
 | 14 | Dashboards and reports: role-specific live statistics, workflow queues on every dashboard, admin report aggregates and applications CSV export | Done |
+| 15 | Final polish: documentation aligned with the delivered system (services, routes, notifications, audit, reports), full test suite + seed verification | Done |
 
 Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

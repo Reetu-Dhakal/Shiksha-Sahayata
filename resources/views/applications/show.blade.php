@@ -105,6 +105,52 @@
     </section>
 @endif
 
+@if ($application->appeal)
+    <section class="mt-4 rounded border border-slate-200 bg-white p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-sm font-semibold text-slate-900">Appeal</h2>
+            <x-status-badge :type="$application->appeal->status->badgeType()" :label="$application->appeal->status->label()" />
+        </div>
+        <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ $application->appeal->reason }}</p>
+        @if ($application->appeal->review_remarks)
+            <div class="mt-3 rounded border border-slate-200 bg-slate-50 px-3 py-2">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Appeal decision</p>
+                <p class="mt-1 text-sm text-slate-700">{{ $application->appeal->review_remarks }}</p>
+                <p class="mt-1 text-xs text-slate-500">
+                    {{ $application->appeal->reviewer?->name ?: 'Reviewer' }}
+                    @if ($application->appeal->decided_at) · {{ $application->appeal->decided_at->format('j M Y') }} @endif
+                </p>
+            </div>
+        @else
+            <p class="mt-2 text-xs text-slate-500">Submitted {{ $application->appeal->submitted_at?->format('j M Y, H:i') ?: '—' }} — the committee will review it.</p>
+        @endif
+    </section>
+@elseif ($application->status === \App\Enums\ApplicationStatus::REJECTED && $application->decision)
+    <section class="mt-4 rounded border border-slate-200 bg-white p-4">
+        <h2 class="text-sm font-semibold text-slate-900">Appeal this decision</h2>
+        <p class="mt-1 text-xs text-slate-500">
+            If you believe the decision is incorrect, submit an appeal. One appeal is allowed per application and the committee will review it.
+        </p>
+
+        <form method="POST" action="{{ route('applications.appeal', $application) }}" class="mt-3">
+            @csrf
+            @method('PATCH')
+
+            <label for="appeal_reason" class="mb-1 block text-xs font-medium text-slate-600">Reason for appeal *</label>
+            <textarea id="appeal_reason" name="reason" rows="5" required
+                      placeholder="Explain why the decision should be reviewed (minimum 40 characters)."
+                      class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">{{ old('reason') }}</textarea>
+            @error('reason')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            @error('application')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+
+            <button type="submit" class="mt-3 rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900"
+                    onclick="return confirm('Submit this appeal?');">
+                Submit appeal
+            </button>
+        </form>
+    </section>
+@endif
+
 <div class="mt-6 grid gap-6 lg:grid-cols-3">
     <section class="rounded border border-slate-200 bg-white p-4 lg:col-span-2">
         <h2 class="text-sm font-semibold text-slate-900">Application details</h2>

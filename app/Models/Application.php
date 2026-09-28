@@ -74,6 +74,11 @@ class Application extends Model
         return $this->hasOne(SelectionDecision::class);
     }
 
+    public function appeal(): HasOne
+    {
+        return $this->hasOne(Appeal::class);
+    }
+
     public function weightedTotal(): float
     {
         $total = 0.0;

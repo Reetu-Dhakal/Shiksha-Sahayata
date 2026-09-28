@@ -70,6 +70,7 @@ class ScholarshipManagementTest extends TestCase
     {
         $admin = $this->admin();
 
+        $this->actingAs($admin)->get('/admin/scholarships')->assertOk()->assertSee('Scholarship Management');
         $this->actingAs($admin)->get('/admin/scholarships/create')->assertOk()->assertSee('Create scholarship');
 
         $this->actingAs($admin)->post('/admin/scholarships', $this->baseData());

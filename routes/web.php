@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\LocalEducationUnitController;
 use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\AppealController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ApplicationDocumentController;
 use App\Http\Controllers\Auth\LoginController;
@@ -58,6 +59,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{application}/edit', [ApplicationController::class, 'edit'])->whereNumber('application')->name('edit');
         Route::put('/{application}', [ApplicationController::class, 'update'])->whereNumber('application')->name('update');
         Route::patch('/{application}/submit', [ApplicationController::class, 'submit'])->whereNumber('application')->name('submit');
+        Route::patch('/{application}/appeal', [AppealController::class, 'store'])->whereNumber('application')->name('appeal');
         Route::delete('/{application}', [ApplicationController::class, 'destroy'])->whereNumber('application')->name('destroy');
         Route::get('/{application}/documents', [ApplicationDocumentController::class, 'index'])->whereNumber('application')->name('documents.index');
         Route::post('/{application}/documents', [ApplicationDocumentController::class, 'store'])->whereNumber('application')->name('documents.store');
@@ -86,8 +88,15 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{application}/decision', [SelectionController::class, 'decide'])->whereNumber('application')->name('decision');
     });
 
+    Route::middleware('role:committee,admin')->prefix('appeals')->name('appeals.')->group(function () {
+        Route::get('/', [AppealController::class, 'index'])->name('index');
+        Route::get('/{appeal}', [AppealController::class, 'show'])->whereNumber('appeal')->name('show');
+        Route::patch('/{appeal}/reopen', [AppealController::class, 'reopen'])->whereNumber('appeal')->name('reopen');
+        Route::patch('/{appeal}/decision', [AppealController::class, 'decide'])->whereNumber('appeal')->name('decision');
+    });
+
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::get('scholarships', [PublicScholarshipController::class, 'index'])->name('scholarships.index');
+        Route::get('scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
         Route::get('scholarships/create', [ScholarshipController::class, 'create'])->name('scholarships.create');
         Route::post('scholarships', [ScholarshipController::class, 'store'])->name('scholarships.store');
         Route::get('scholarships/{scholarship}/edit', [ScholarshipController::class, 'edit'])->name('scholarships.edit');

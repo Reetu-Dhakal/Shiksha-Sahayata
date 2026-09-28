@@ -9,10 +9,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardianProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\ScholarshipController as PublicScholarshipController;
 use App\Http\Controllers\StudentProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/scholarships', [PublicScholarshipController::class, 'index'])->name('scholarships.index');
+Route::get('/scholarships/{scholarship}', [PublicScholarshipController::class, 'show'])->whereNumber('scholarship')->name('scholarships.show');
 
 Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 
@@ -43,7 +47,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::get('scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
+        Route::get('scholarships', [PublicScholarshipController::class, 'index'])->name('scholarships.index');
         Route::get('scholarships/create', [ScholarshipController::class, 'create'])->name('scholarships.create');
         Route::post('scholarships', [ScholarshipController::class, 'store'])->name('scholarships.store');
         Route::get('scholarships/{scholarship}/edit', [ScholarshipController::class, 'edit'])->name('scholarships.edit');

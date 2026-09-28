@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -22,9 +23,7 @@ class DashboardTest extends TestCase
         $this->get('/register')->assertOk();
     }
 
-    /**
-     * @dataProvider roleDashboardProvider
-     */
+    #[DataProvider('roleDashboardProvider')]
     public function test_each_role_can_render_its_dashboard(string $role): void
     {
         $user = User::factory()->create(['role' => Role::from($role)]);

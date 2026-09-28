@@ -288,3 +288,18 @@ Clearly labelled as **future work only** — none of these currently exist in th
 ## 18. Academic Context
 
 Shiksha Sahayata is developed as a BSc CSIT academic project. It demonstrates a complete, coherent e-governance workflow using a single Laravel application and a single MySQL database, with an emphasis on maintainability, security, privacy and honest documentation.
+
+---
+
+## 19. Development Progress
+
+Incremental build log (each phase committed and pushed with passing tests):
+
+| Phase | Delivered | Status |
+|-------|-----------|--------|
+| 1 | Laravel 12 skeleton, Tailwind 4 + Vite, MySQL config, README/AGENT docs, dependencies (dompdf, QR) | Done |
+| 2 | Roles enum, auth (email/phone, rate-limited), role middleware, per-role dashboards, layouts/nav, locale switcher (en/np) | Done |
+| 3 | Schools, local education units, guardians, students, Scholar Student ID generation, profile management, admin school/LEU CRUD | Done |
+| 4 | Scholarship management: drafts, eligibility rules, weighted criteria, required documents, committee assignment, publishing preconditions | Done |
+
+Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

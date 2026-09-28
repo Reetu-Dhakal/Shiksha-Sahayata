@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             LocalEducationUnitSeeder::class,
             UserSeeder::class,
             StudentProfileSeeder::class,
+            ScholarshipSeeder::class,
         ]);
     }
 }

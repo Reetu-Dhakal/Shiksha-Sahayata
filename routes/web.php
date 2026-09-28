@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\LocalEducationUnitController;
+use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -42,6 +43,13 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
+        Route::get('scholarships/create', [ScholarshipController::class, 'create'])->name('scholarships.create');
+        Route::post('scholarships', [ScholarshipController::class, 'store'])->name('scholarships.store');
+        Route::get('scholarships/{scholarship}/edit', [ScholarshipController::class, 'edit'])->name('scholarships.edit');
+        Route::put('scholarships/{scholarship}', [ScholarshipController::class, 'update'])->name('scholarships.update');
+        Route::patch('scholarships/{scholarship}/status', [ScholarshipController::class, 'updateStatus'])->name('scholarships.status');
+
         Route::get('schools', [SchoolController::class, 'index'])->name('schools.index');
         Route::get('schools/create', [SchoolController::class, 'create'])->name('schools.create');
         Route::post('schools', [SchoolController::class, 'store'])->name('schools.store');

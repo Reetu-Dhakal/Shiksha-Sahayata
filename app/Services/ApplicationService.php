@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Enums\ApplicationStatus;
 use App\Enums\Role;
 use App\Models\Application;
+use App\Models\RequiredDocument;
 use App\Models\Scholarship;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ApplicationService
@@ -90,6 +92,19 @@ class ApplicationService
             ]);
         }
 
+        $missing = $application->scholarship->requiredDocuments
+            ->filter(fn (RequiredDocument $document): bool => $document->is_required)
+            ->reject(fn (RequiredDocument $document): bool => $application->documents()
+                ->where('document_type', $document->document_type->value)
+                ->exists())
+            ->map(fn (RequiredDocument $document): string => $document->document_type->label());
+
+        if ($missing->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'documents' => 'Upload the required documents before submitting: '.$missing->implode(', ').'.',
+            ]);
+        }
+
         $application->update([
             'status' => ApplicationStatus::SUBMITTED,
             'submitted_at' => now(),
@@ -110,7 +125,10 @@ class ApplicationService
             ]);
         }
 
-        DB::transaction(fn () => $application->delete());
+        DB::transaction(function () use ($application): void {
+            $application->delete();
+            Storage::disk('local')->deleteDirectory('applications/'.$application->id);
+        });
     }
 
     public function canView(Application $application, User $actor): bool

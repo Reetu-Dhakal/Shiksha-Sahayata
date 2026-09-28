@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\LocalEducationUnitController;
 use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\ApplicationDocumentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
@@ -56,6 +57,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/{application}', [ApplicationController::class, 'update'])->whereNumber('application')->name('update');
         Route::patch('/{application}/submit', [ApplicationController::class, 'submit'])->whereNumber('application')->name('submit');
         Route::delete('/{application}', [ApplicationController::class, 'destroy'])->whereNumber('application')->name('destroy');
+        Route::get('/{application}/documents', [ApplicationDocumentController::class, 'index'])->whereNumber('application')->name('documents.index');
+        Route::post('/{application}/documents', [ApplicationDocumentController::class, 'store'])->whereNumber('application')->name('documents.store');
+        Route::get('/{application}/documents/{document}/download', [ApplicationDocumentController::class, 'download'])->whereNumber('application')->whereNumber('document')->name('documents.download');
+        Route::delete('/{application}/documents/{document}', [ApplicationDocumentController::class, 'destroy'])->whereNumber('application')->whereNumber('document')->name('documents.destroy');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

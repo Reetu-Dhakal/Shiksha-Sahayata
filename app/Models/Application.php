@@ -79,6 +79,11 @@ class Application extends Model
         return $this->hasOne(Appeal::class);
     }
 
+    public function award(): HasOne
+    {
+        return $this->hasOne(Award::class);
+    }
+
     public function weightedTotal(): float
     {
         $total = 0.0;

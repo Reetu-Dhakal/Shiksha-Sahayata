@@ -307,5 +307,6 @@ Incremental build log (each phase committed and pushed with passing tests):
 | 8 | Two-stage verification: school and local education officer queues, jurisdiction scoping, approve/forward and return-for-correction with remarks | Done |
 | 9 | Selection: committee-scoped queues, weighted criterion scoring with live totals, reasoned SELECTED/WAITLISTED/REJECTED decisions | Done |
 | 10 | Appeals: one appeal per rejection, reopen back into selection review, reasoned approve/reject outcomes visible to the applicant | Done |
+| 11 | Awards: issue numbered awards with QR verification codes, step-by-step disbursement tracking, revocation, PDF award letter, public verification page | Done |
 
 Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

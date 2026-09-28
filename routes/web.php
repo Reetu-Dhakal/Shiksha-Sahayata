@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AwardController as AdminAwardController;
 use App\Http\Controllers\Admin\LocalEducationUnitController;
 use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\SchoolController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ApplicationDocumentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\AwardController;
+use App\Http\Controllers\AwardVerificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardianProfileController;
 use App\Http\Controllers\HomeController;
@@ -22,6 +25,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/scholarships', [PublicScholarshipController::class, 'index'])->name('scholarships.index');
 Route::get('/scholarships/{scholarship}', [PublicScholarshipController::class, 'show'])->whereNumber('scholarship')->name('scholarships.show');
+
+Route::get('/verify/award', [AwardVerificationController::class, 'form'])->name('verify.award.form');
+Route::get('/verify/award/{code}', [AwardVerificationController::class, 'show'])->where('code', '[A-Za-z0-9\-]+')->name('verify.award.show');
 
 Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 
@@ -88,6 +94,11 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{application}/decision', [SelectionController::class, 'decide'])->whereNumber('application')->name('decision');
     });
 
+    Route::middleware('role:student,guardian')->prefix('awards')->name('awards.')->group(function () {
+        Route::get('/', [AwardController::class, 'index'])->name('index');
+        Route::get('/{award}/letter', [AwardController::class, 'letter'])->whereNumber('award')->name('letter');
+    });
+
     Route::middleware('role:committee,admin')->prefix('appeals')->name('appeals.')->group(function () {
         Route::get('/', [AppealController::class, 'index'])->name('index');
         Route::get('/{appeal}', [AppealController::class, 'show'])->whereNumber('appeal')->name('show');
@@ -108,6 +119,11 @@ Route::middleware('auth')->group(function () {
         Route::post('schools', [SchoolController::class, 'store'])->name('schools.store');
         Route::get('schools/{school}/edit', [SchoolController::class, 'edit'])->name('schools.edit');
         Route::put('schools/{school}', [SchoolController::class, 'update'])->name('schools.update');
+
+        Route::get('awards', [AdminAwardController::class, 'index'])->name('awards.index');
+        Route::post('awards/issue/{application}', [AdminAwardController::class, 'issue'])->whereNumber('application')->name('awards.issue');
+        Route::patch('awards/{award}/disbursement', [AdminAwardController::class, 'updateDisbursement'])->whereNumber('award')->name('awards.disbursement');
+        Route::patch('awards/{award}/revoke', [AdminAwardController::class, 'revoke'])->whereNumber('award')->name('awards.revoke');
 
         Route::get('local-education-units', [LocalEducationUnitController::class, 'index'])->name('local-education-units.index');
         Route::get('local-education-units/create', [LocalEducationUnitController::class, 'create'])->name('local-education-units.create');

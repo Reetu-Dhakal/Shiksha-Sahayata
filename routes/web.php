@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\LocalEducationUnitController;
+use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuardianProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\StudentProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -21,4 +25,33 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
+
+    Route::middleware('role:student')->prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [StudentProfileController::class, 'show'])->name('show');
+        Route::get('/create', [StudentProfileController::class, 'create'])->name('create');
+        Route::post('/', [StudentProfileController::class, 'store'])->name('store');
+        Route::get('/edit', [StudentProfileController::class, 'edit'])->name('edit');
+        Route::put('/', [StudentProfileController::class, 'update'])->name('update');
+    });
+
+    Route::middleware('role:guardian')->prefix('guardian')->name('guardian.')->group(function () {
+        Route::get('/profile', [GuardianProfileController::class, 'show'])->name('profile.show');
+        Route::post('/profile', [GuardianProfileController::class, 'store'])->name('profile.store');
+        Route::put('/profile', [GuardianProfileController::class, 'update'])->name('profile.update');
+        Route::post('/students', [GuardianProfileController::class, 'linkStudent'])->name('students.link');
+    });
+
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('schools', [SchoolController::class, 'index'])->name('schools.index');
+        Route::get('schools/create', [SchoolController::class, 'create'])->name('schools.create');
+        Route::post('schools', [SchoolController::class, 'store'])->name('schools.store');
+        Route::get('schools/{school}/edit', [SchoolController::class, 'edit'])->name('schools.edit');
+        Route::put('schools/{school}', [SchoolController::class, 'update'])->name('schools.update');
+
+        Route::get('local-education-units', [LocalEducationUnitController::class, 'index'])->name('local-education-units.index');
+        Route::get('local-education-units/create', [LocalEducationUnitController::class, 'create'])->name('local-education-units.create');
+        Route::post('local-education-units', [LocalEducationUnitController::class, 'store'])->name('local-education-units.store');
+        Route::get('local-education-units/{unit}/edit', [LocalEducationUnitController::class, 'edit'])->name('local-education-units.edit');
+        Route::put('local-education-units/{unit}', [LocalEducationUnitController::class, 'update'])->name('local-education-units.update');
+    });
 });

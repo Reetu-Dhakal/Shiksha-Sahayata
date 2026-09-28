@@ -1,8 +1,7 @@
 @php
     $items = [
         ['route' => 'dashboard', 'label' => __('nav.dashboard')],
-        ['route' => 'admin.schools.index', 'label' => __('nav.schools')],
-        ['route' => 'admin.local-education-units.index', 'label' => __('nav.local_units')],
+        ['route' => 'guardian.profile.show', 'label' => __('nav.profile')],
     ];
 @endphp
 

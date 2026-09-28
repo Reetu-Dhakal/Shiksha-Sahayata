@@ -4,11 +4,44 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-lg font-semibold text-slate-900">Student Dashboard</h1>
+    <h1 class="text-lg font-semibold text-slate-900">{{ auth()->user()->role === \App\Enums\Role::GUARDIAN ? 'Guardian Dashboard' : 'Student Dashboard' }}</h1>
     <p class="mt-1 text-sm text-slate-600">Your profile, potentially suitable scholarships, applications and awards.</p>
 </div>
 
 <div class="grid gap-4 lg:grid-cols-2">
+    <section class="rounded border border-slate-200 bg-white p-4">
+        <h2 class="text-sm font-semibold text-slate-900">{{ auth()->user()->role === \App\Enums\Role::GUARDIAN ? 'Guardian profile' : 'Student profile' }}</h2>
+        @if (auth()->user()->role === \App\Enums\Role::GUARDIAN)
+            @if (auth()->user()->guardian)
+                <p class="mt-2 text-sm text-slate-600">
+                    {{ auth()->user()->guardian->name }} ({{ auth()->user()->guardian->relationship }})
+                </p>
+                <a href="{{ route('guardian.profile.show') }}" class="mt-3 inline-block text-sm font-medium text-blue-800 hover:underline">{{ __('nav.profile') }}</a>
+            @else
+                <x-empty-state title="No guardian profile yet" message="Create your guardian profile, then link your child's Scholar Student ID.">
+                    <a href="{{ route('guardian.profile.show') }}" class="rounded bg-blue-800 px-4 py-2 text-xs font-medium text-white hover:bg-blue-900">Create profile</a>
+                </x-empty-state>
+            @endif
+        @elseif (auth()->user()->student)
+            <p class="mt-2 text-sm text-slate-600">
+                Scholar Student ID: <span class="font-medium text-slate-800">{{ auth()->user()->student->scholar_student_id }}</span>
+            </p>
+            <p class="mt-1 text-sm text-slate-600">
+                Profile status:
+                @if (auth()->user()->student->isVerified())
+                    <x-status-badge type="success" label="Verified" />
+                @else
+                    <x-status-badge type="warning" label="Not yet verified" />
+                @endif
+            </p>
+            <a href="{{ route('profile.show') }}" class="mt-3 inline-block text-sm font-medium text-blue-800 hover:underline">{{ __('nav.profile') }}</a>
+        @else
+            <x-empty-state title="No student profile yet" message="Complete your student profile to receive your Scholar Student ID and start applying.">
+                <a href="{{ route('profile.create') }}" class="rounded bg-blue-800 px-4 py-2 text-xs font-medium text-white hover:bg-blue-900">Complete profile</a>
+            </x-empty-state>
+        @endif
+    </section>
+
     <section class="rounded border border-slate-200 bg-white p-4">
         <h2 class="text-sm font-semibold text-slate-900">My applications</h2>
         <div class="mt-2">

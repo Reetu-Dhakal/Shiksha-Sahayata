@@ -17,6 +17,7 @@ class DashboardController extends Controller
             Role::SCHOOL_OFFICER => ['dashboard.school', 'school'],
             Role::LOCAL_OFFICER => ['dashboard.local', 'local'],
             Role::COMMITTEE => ['dashboard.committee', 'committee'],
+            Role::GUARDIAN => ['dashboard.student', 'guardian'],
             default => ['dashboard.student', 'student'],
         };
 

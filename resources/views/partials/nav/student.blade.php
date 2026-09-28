@@ -1,6 +1,7 @@
 @php
     $items = [
         ['route' => 'dashboard', 'label' => __('nav.dashboard')],
+        ['route' => 'profile.show', 'label' => __('nav.profile')],
     ];
 @endphp
 

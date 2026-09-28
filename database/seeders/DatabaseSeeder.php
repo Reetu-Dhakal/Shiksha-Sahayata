@@ -9,6 +9,7 @@ use Illuminate\Database\Seeder;
 
 /**
  * ALL DATA CREATED BY THIS SEEDER IS FICTIONAL DEMO DATA.
+ * Demo account password: "password".
  */
 class DatabaseSeeder extends Seeder
 {
@@ -30,5 +31,12 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        $this->call([
+            SchoolSeeder::class,
+            LocalEducationUnitSeeder::class,
+            UserSeeder::class,
+            StudentProfileSeeder::class,
+        ]);
     }
 }

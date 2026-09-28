@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -74,5 +76,37 @@ class User extends Authenticatable
     public function isApplicant(): bool
     {
         return $this->role->isApplicant();
+    }
+
+    /**
+     * The student profile owned by this account.
+     */
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    /**
+     * The guardian profile owned by this account.
+     */
+    public function guardian(): HasOne
+    {
+        return $this->hasOne(Guardian::class);
+    }
+
+    /**
+     * School jurisdiction (school officers).
+     */
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    /**
+     * Local education unit jurisdiction (local education officers).
+     */
+    public function localEducationUnit(): BelongsTo
+    {
+        return $this->belongsTo(LocalEducationUnit::class);
     }
 }

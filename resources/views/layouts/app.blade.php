@@ -50,7 +50,14 @@
     <div class="mx-auto flex max-w-7xl gap-6 px-4 py-6">
         <aside class="hidden w-60 shrink-0 lg:block">
             <nav class="rounded border border-slate-200 bg-white p-2">
-                @include('partials.nav.'.$nav)
+                @include('partials.nav.'.($nav ?? match (auth()->user()->role) {
+                    \App\Enums\Role::ADMIN => 'admin',
+                    \App\Enums\Role::SCHOOL_OFFICER => 'school',
+                    \App\Enums\Role::LOCAL_OFFICER => 'local',
+                    \App\Enums\Role::COMMITTEE => 'committee',
+                    \App\Enums\Role::GUARDIAN => 'guardian',
+                    default => 'student',
+                }))
             </nav>
         </aside>
 
@@ -61,7 +68,14 @@
                     <span x-text="mobileNav ? '▴' : '▾'"></span>
                 </button>
                 <nav class="border-t border-slate-100 p-2" x-show="mobileNav" x-cloak style="display: none">
-                    @include('partials.nav.'.$nav)
+                    @include('partials.nav.'.($nav ?? match (auth()->user()->role) {
+                        \App\Enums\Role::ADMIN => 'admin',
+                        \App\Enums\Role::SCHOOL_OFFICER => 'school',
+                        \App\Enums\Role::LOCAL_OFFICER => 'local',
+                        \App\Enums\Role::COMMITTEE => 'committee',
+                        \App\Enums\Role::GUARDIAN => 'guardian',
+                        default => 'student',
+                    }))
                 </nav>
             </div>
 

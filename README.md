@@ -65,7 +65,7 @@ Administratively, scholarship processing requires coordination between students,
 
 | Role | Capabilities |
 |------|--------------|
-| **Student / Guardian** | Manage profile, discover scholarships, apply, upload documents, track status, appeal, view awards. |
+| **Student / Guardian** | Manage profile, discover scholarships, apply, upload documents, track status, appeal, view awards. Student and guardian are separate account types sharing one applicant dashboard. |
 | **School Officer** | Verify enrollment/grade/documents for their own school, return applications with remarks, assist applicants. |
 | **Local Education Officer** | Verify local criteria for their own local education unit, approve/return, assist applicants. |
 | **Selection Committee Member** | Review verified applications, view/calculcate scores, record SELECTED / WAITLISTED / REJECTED with reasons. |

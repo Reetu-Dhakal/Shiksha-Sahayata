@@ -2,10 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * ALL DATA CREATED BY THIS SEEDER IS FICTIONAL DEMO DATA.
+ */
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -15,11 +19,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::query()->firstOrCreate(
+            ['email' => 'admin@shikshasahayata.np'],
+            [
+                'name' => 'System Administrator',
+                'phone' => '9800000001',
+                'password' => 'password',
+                'role' => Role::ADMIN,
+                'status' => User::STATUS_ACTIVE,
+                'email_verified_at' => now(),
+            ]
+        );
     }
 }

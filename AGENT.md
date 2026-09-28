@@ -99,7 +99,8 @@ tests/Feature|Unit             Required test coverage
 | Role (`users.role`) | Jurisdiction | Notes |
 |---|---|---|
 | `ADMIN` | system | Manages everything, reports, audit logs. |
-| `STUDENT` | own profile/applications | Also used for guardian accounts (linked via `guardians`). |
+| `STUDENT` | own profile/applications | The student applicant account. |
+| `GUARDIAN` | linked students (`students.guardian_id`) | Guardian account; shares the student/guardian dashboard. |
 | `SCHOOL_OFFICER` | own `users.school_id` | Verification for that school's applications only. |
 | `LOCAL_OFFICER` | own `users.local_education_unit_id` | Verification within that LEU only. |
 | `COMMITTEE` | scholarships they are assigned to (`scholarship_committee`) | Reviews/decides only after both verifications pass. |

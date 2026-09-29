@@ -1,30 +1,30 @@
 @extends('layouts.app')
 
-@section('title', $assisted ? __('nav.assisted_applications') : 'My applications')
+@section('title', $assisted ? __('nav.assisted_applications') : __('application.my_applications'))
 
 @section('content')
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-        <h1 class="text-lg font-semibold text-slate-900">{{ $assisted ? __('nav.assisted_applications') : 'My applications' }}</h1>
+        <h1 class="text-lg font-semibold text-slate-900">{{ $assisted ? __('nav.assisted_applications') : __('application.my_applications') }}</h1>
         <p class="mt-1 text-sm text-slate-600">
             {{ $assisted
-                ? 'Applications you filled in on behalf of students in your jurisdiction. They keep full access to their own application.'
-                : 'Track every application from submission through verification and selection.' }}
+                ? __('application.index.assisted_intro')
+                : __('application.index.intro') }}
         </p>
     </div>
     <a href="{{ route('applications.create') }}" class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900">
-        {{ $assisted ? 'New assisted application' : 'Apply for a scholarship' }}
+        {{ $assisted ? __('application.new_assisted_application') : __('application.index.new_application') }}
     </a>
 </div>
 
 @if ($applications->isEmpty())
     <x-empty-state
-        :title="$assisted ? 'No assisted applications yet' : 'No applications yet'"
+        :title="$assisted ? __('application.index.empty_assisted_title') : __('application.index.empty_title')"
         :message="$assisted
-            ? 'Fill an application on behalf of a student in your jurisdiction and it will appear here.'
-            : 'Browse open scholarships and submit your first application.'">
+            ? __('application.index.empty_assisted_message')
+            : __('application.index.empty_message')">
         @unless ($assisted)
-            <a href="{{ route('scholarships.index') }}" class="text-sm font-medium text-blue-800 hover:underline">Browse scholarships</a>
+            <a href="{{ route('scholarships.index') }}" class="text-sm font-medium text-blue-800 hover:underline">{{ __('application.index.browse_scholarships') }}</a>
         @endunless
     </x-empty-state>
 @else
@@ -40,8 +40,8 @@
                             </a>
                         </h2>
                         <p class="mt-1 text-xs text-slate-500">
-                            Applicant: {{ $application->student->name }} · {{ $application->student->scholar_student_id }}
-                            @if ($application->is_assisted) · <span class="font-medium">Assisted application</span> @endif
+                            {{ __('application.applicant') }} {{ $application->student->name }} · {{ $application->student->scholar_student_id }}
+                            @if ($application->is_assisted) · <span class="font-medium">{{ __('application.assisted_application') }}</span> @endif
                         </p>
                     </div>
                     <x-status-badge :type="$application->status->badgeType()" :label="$application->status->label()" />
@@ -49,12 +49,14 @@
 
                 <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs text-slate-500">
                     <span>
-                        {{ $application->submitted_at?->format('j M Y, H:i') ? 'Submitted '.$application->submitted_at->format('j M Y, H:i') : 'Not submitted yet · deadline '.$application->scholarship->application_deadline->format('j M Y') }}
+                        {{ $application->submitted_at
+                            ? __('application.index.submitted', ['date' => format_date($application->submitted_at, 'j M Y, H:i')])
+                            : __('application.index.not_submitted', ['date' => format_date($application->scholarship->application_deadline, 'j M Y')]) }}
                     </span>
                     <div class="flex gap-3">
-                        <a href="{{ route('applications.show', $application) }}" class="font-medium text-blue-800 hover:underline">View</a>
+                        <a href="{{ route('applications.show', $application) }}" class="font-medium text-blue-800 hover:underline">{{ __('common.view') }}</a>
                         @if ($application->isEditable())
-                            <a href="{{ route('applications.edit', $application) }}" class="font-medium text-blue-800 hover:underline">Edit</a>
+                            <a href="{{ route('applications.edit', $application) }}" class="font-medium text-blue-800 hover:underline">{{ __('common.edit') }}</a>
                         @endif
                     </div>
                 </div>

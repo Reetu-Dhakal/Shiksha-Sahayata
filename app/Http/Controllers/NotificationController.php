@@ -26,7 +26,7 @@ class NotificationController extends Controller
     {
         $this->notifications->markAllRead($request->user());
 
-        return back()->with('status', 'All notifications marked as read.');
+        return back()->with('status', __('activity.flash.all_read'));
     }
 
     public function markRead(Request $request, Notification $notification): RedirectResponse

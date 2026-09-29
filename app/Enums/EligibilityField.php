@@ -12,13 +12,7 @@ enum EligibilityField: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::EDUCATION_LEVEL => 'Education level',
-            self::STUDENT_CATEGORY => 'Student category',
-            self::DISTRICT => 'District',
-            self::PROVINCE => 'Province',
-            self::GENDER => 'Gender',
-        };
+        return __('enum.eligibility_field.'.$this->value);
     }
 
     /**

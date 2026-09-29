@@ -9,10 +9,7 @@ enum VerificationStage: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::SCHOOL => 'School verification',
-            self::LOCAL => 'Local education unit verification',
-        };
+        return __('enum.verification_stage.'.$this->value);
     }
 
     public function badgeType(): string

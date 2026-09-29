@@ -11,12 +11,7 @@ enum ScholarshipStatus: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::DRAFT => 'Draft',
-            self::PUBLISHED => 'Published',
-            self::CLOSED => 'Closed',
-            self::COMPLETED => 'Completed',
-        };
+        return __('status.scholarship.'.$this->value);
     }
 
     public function badgeType(): string

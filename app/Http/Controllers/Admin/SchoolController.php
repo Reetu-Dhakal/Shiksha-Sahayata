@@ -46,7 +46,7 @@ class SchoolController extends Controller
 
         return redirect()
             ->route('admin.schools.index')
-            ->with('status', 'School created.');
+            ->with('status', __('admin.flash.school_created'));
     }
 
     public function edit(School $school): View
@@ -62,6 +62,6 @@ class SchoolController extends Controller
 
         return redirect()
             ->route('admin.schools.index')
-            ->with('status', 'School updated.');
+            ->with('status', __('admin.flash.school_updated'));
     }
 }

@@ -4,8 +4,8 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-lg font-semibold text-slate-900">Selection Committee Dashboard</h1>
-    <p class="mt-1 text-sm text-slate-600">Verified applications ready for review on scholarships you are assigned to.</p>
+    <h1 class="text-lg font-semibold text-slate-900">{{ __('dashboard.committee.title') }}</h1>
+    <p class="mt-1 text-sm text-slate-600">{{ __('dashboard.committee.intro') }}</p>
 </div>
 
 <x-stat-cards :stats="$dashboard['stats']" />
@@ -13,12 +13,12 @@
 <div class="mt-6 grid gap-4 lg:grid-cols-2">
     <section class="rounded border border-slate-200 bg-white p-4">
         <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-slate-900">Ready for review</h2>
+            <h2 class="text-sm font-semibold text-slate-900">{{ __('dashboard.committee.ready_heading') }}</h2>
             <a href="{{ route('selection.index') }}" class="text-xs font-medium text-blue-800 hover:underline">{{ __('nav.selection') }}</a>
         </div>
 
         @if ($dashboard['rows']->isEmpty())
-            <x-empty-state title="Nothing to review" message="Applications that pass all required verifications will appear here." />
+            <x-empty-state :title="__('dashboard.committee.empty_review_title')" :message="__('dashboard.committee.empty_review_message')" />
         @else
             <ul class="mt-3 divide-y divide-slate-100 text-sm">
                 @foreach ($dashboard['rows'] as $application)
@@ -28,7 +28,7 @@
                             <p class="truncate text-xs text-slate-500">{{ $application->scholarship->title }}</p>
                         </div>
                         <a href="{{ route('selection.show', $application) }}" class="shrink-0 text-xs font-medium text-blue-800 hover:underline">
-                            Open
+                            {{ __('dashboard.open') }}
                         </a>
                     </li>
                 @endforeach
@@ -38,12 +38,12 @@
 
     <section class="rounded border border-slate-200 bg-white p-4">
         <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-slate-900">Decisions recorded</h2>
+            <h2 class="text-sm font-semibold text-slate-900">{{ __('dashboard.committee.decisions_heading') }}</h2>
             <a href="{{ route('appeals.index') }}" class="text-xs font-medium text-blue-800 hover:underline">{{ __('nav.appeals') }}</a>
         </div>
 
         @if ($dashboard['byStatus']->isEmpty())
-            <x-empty-state title="No decisions yet" message="Selected, waitlisted and rejected counts will appear here." />
+            <x-empty-state :title="__('dashboard.committee.empty_decisions_title')" :message="__('dashboard.committee.empty_decisions_message')" />
         @else
             <ul class="mt-3 divide-y divide-slate-100 text-sm">
                 @foreach ($dashboard['byStatus'] as $label => $count)

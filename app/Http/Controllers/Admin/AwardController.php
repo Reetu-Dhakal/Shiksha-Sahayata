@@ -36,7 +36,7 @@ class AwardController extends Controller
     {
         $this->awards->issue($application, $request->user());
 
-        return back()->with('status', 'Award issued. The applicant can now download the award letter.');
+        return back()->with('status', __('admin.flash.award_issued'));
     }
 
     public function updateDisbursement(DisbursementRequest $request, Award $award): RedirectResponse
@@ -47,7 +47,7 @@ class AwardController extends Controller
             $request->validated('remarks'),
         );
 
-        return back()->with('status', 'Disbursement status updated.');
+        return back()->with('status', __('admin.flash.disbursement_updated'));
     }
 
     public function revoke(Request $request, Award $award): RedirectResponse
@@ -58,6 +58,6 @@ class AwardController extends Controller
 
         $this->awards->revoke($award, $request->user(), $data['reason']);
 
-        return back()->with('status', 'Award revoked.');
+        return back()->with('status', __('admin.flash.award_revoked'));
     }
 }

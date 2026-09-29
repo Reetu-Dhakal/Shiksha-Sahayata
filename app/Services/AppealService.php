@@ -31,18 +31,18 @@ class AppealService
     public function submit(User $actor, Application $application, string $reason): Appeal
     {
         if (! $this->applications->canView($application, $actor)) {
-            abort(403, 'You are not allowed to act on this application.');
+            abort(403, __('workflow.appeal.errors.forbidden'));
         }
 
         if ($application->status !== ApplicationStatus::REJECTED) {
             throw ValidationException::withMessages([
-                'application' => 'Only rejected applications can be appealed.',
+                'application' => __('workflow.appeal.errors.only_rejected'),
             ]);
         }
 
         if ($application->appeal()->exists()) {
             throw ValidationException::withMessages([
-                'application' => 'An appeal has already been submitted for this application.',
+                'application' => __('workflow.appeal.errors.already_appealed'),
             ]);
         }
 
@@ -61,7 +61,7 @@ class AppealService
         });
 
         $params = [
-            'scholarship' => $application->scholarship->title,
+            'scholarship' => $application->scholarship->getRawOriginal('title'),
             'student' => $application->student->name,
             'appeal' => (string) $appeal->id,
         ];
@@ -96,7 +96,7 @@ class AppealService
     public function queueFor(User $reviewer): Builder
     {
         if (! $this->isReviewer($reviewer)) {
-            abort(403, 'Only the selection committee and administrators can review appeals.');
+            abort(403, __('workflow.appeal.errors.not_reviewer'));
         }
 
         $query = Appeal::query()
@@ -137,7 +137,7 @@ class AppealService
     public function assertCanReview(User $reviewer, Appeal $appeal): void
     {
         if (! $this->canReview($reviewer, $appeal)) {
-            abort(403, 'This appeal is not assigned to you.');
+            abort(403, __('workflow.appeal.errors.not_assigned'));
         }
     }
 
@@ -150,7 +150,7 @@ class AppealService
 
         if ($appeal->status !== AppealStatus::SUBMITTED) {
             throw ValidationException::withMessages([
-                'status' => 'This appeal is not waiting to be reopened.',
+                'status' => __('workflow.appeal.errors.not_reopenable'),
             ]);
         }
 
@@ -158,7 +158,7 @@ class AppealService
 
         if ($application->status !== ApplicationStatus::APPEALED) {
             throw ValidationException::withMessages([
-                'status' => 'The application is not in the appealed state.',
+                'status' => __('workflow.appeal.errors.not_appealed'),
             ]);
         }
 
@@ -185,7 +185,7 @@ class AppealService
 
         if ($appeal->status !== AppealStatus::UNDER_REVIEW) {
             throw ValidationException::withMessages([
-                'status' => 'Reopen the appeal before recording a decision.',
+                'status' => __('workflow.appeal.errors.reopen_first'),
             ]);
         }
 
@@ -193,7 +193,7 @@ class AppealService
 
         if ($application->status !== ApplicationStatus::UNDER_REVIEW) {
             throw ValidationException::withMessages([
-                'status' => 'The application must be back under review first.',
+                'status' => __('workflow.appeal.errors.not_under_review'),
             ]);
         }
 
@@ -213,8 +213,8 @@ class AppealService
         $outcome = $approved ? AppealStatus::APPROVED : AppealStatus::REJECTED;
 
         $params = [
-            'scholarship' => $application->scholarship->title,
-            'outcome' => $outcome->label(),
+            'scholarship' => $application->scholarship->getRawOriginal('title'),
+            'outcome' => $outcome->value,
             'remarks' => $remarks,
             'appeal' => (string) $appeal->id,
         ];

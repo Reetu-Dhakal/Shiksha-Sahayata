@@ -39,8 +39,8 @@ class DocumentUploadRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'file.mimes' => 'Only PDF, JPG or PNG files are accepted.',
-            'file.max' => 'The file must not be larger than 5 MB.',
+            'file.mimes' => __('admin.validation.document_file_mimes'),
+            'file.max' => __('admin.validation.document_file_max'),
         ];
     }
 }

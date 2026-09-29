@@ -26,7 +26,7 @@ class VerificationService
         return match (true) {
             $officer->hasRole(Role::SCHOOL_OFFICER) => VerificationStage::SCHOOL,
             $officer->hasRole(Role::LOCAL_OFFICER) => VerificationStage::LOCAL,
-            default => abort(403, 'Only verification officers can review applications.'),
+            default => abort(403, __('workflow.verification.errors.not_officer')),
         };
     }
 
@@ -100,7 +100,7 @@ class VerificationService
     public function assertCanReview(User $officer, Application $application): void
     {
         if (! $this->canReview($officer, $application)) {
-            abort(403, 'This application is outside your jurisdiction or not at your verification stage.');
+            abort(403, __('workflow.verification.errors.outside_jurisdiction_stage'));
         }
     }
 
@@ -112,12 +112,12 @@ class VerificationService
         $this->stageFor($officer);
 
         if (! $this->inJurisdiction($officer, $application)) {
-            abort(403, 'This application is outside your jurisdiction.');
+            abort(403, __('workflow.verification.errors.outside_jurisdiction'));
         }
 
         if ($application->status !== ApplicationStatus::SUBMITTED) {
             throw ValidationException::withMessages([
-                'status' => 'Only submitted applications can be taken up for review.',
+                'status' => __('workflow.verification.errors.only_submitted'),
             ]);
         }
 
@@ -138,7 +138,7 @@ class VerificationService
 
         if ($application->status !== $stage->requiredStatus()) {
             throw ValidationException::withMessages([
-                'status' => 'This application is not waiting for your verification stage.',
+                'status' => __('workflow.verification.errors.not_waiting'),
             ]);
         }
 
@@ -170,7 +170,7 @@ class VerificationService
         $stage = $this->stageFor($officer);
 
         if (! $this->inJurisdiction($officer, $application)) {
-            abort(403, 'This application is outside your jurisdiction.');
+            abort(403, __('workflow.verification.errors.outside_jurisdiction'));
         }
 
         $allowed = $stage === VerificationStage::SCHOOL
@@ -179,7 +179,7 @@ class VerificationService
 
         if (! in_array($application->status, $allowed, true)) {
             throw ValidationException::withMessages([
-                'status' => 'This application is not waiting for your verification stage.',
+                'status' => __('workflow.verification.errors.not_waiting'),
             ]);
         }
 
@@ -191,7 +191,7 @@ class VerificationService
         $this->record($application, $stage, $officer, VerificationStatus::RETURNED, $remarks);
 
         $params = [
-            'scholarship' => $application->scholarship->title,
+            'scholarship' => $application->scholarship->getRawOriginal('title'),
             'remarks' => $remarks,
             'application' => (string) $application->id,
         ];

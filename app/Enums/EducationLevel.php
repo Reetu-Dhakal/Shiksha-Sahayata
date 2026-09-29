@@ -12,12 +12,6 @@ enum EducationLevel: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::PRIMARY => 'Primary (Grade 1–5)',
-            self::SECONDARY => 'Secondary (Grade 6–10)',
-            self::HIGHER_SECONDARY => 'Higher Secondary (Grade 11–12)',
-            self::BACHELOR => "Bachelor's level",
-            self::MASTER => "Master's level",
-        };
+        return __('enum.education_level.'.$this->value);
     }
 }

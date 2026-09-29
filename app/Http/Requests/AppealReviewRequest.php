@@ -29,7 +29,7 @@ class AppealReviewRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'remarks.min' => 'Record at least 10 characters explaining the appeal decision.',
+            'remarks.min' => __('admin.validation.appeal_review_remarks_min'),
         ];
     }
 }

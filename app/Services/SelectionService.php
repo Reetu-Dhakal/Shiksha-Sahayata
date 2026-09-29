@@ -27,7 +27,7 @@ class SelectionService
     public function queueFor(User $committee): Builder
     {
         if (! $committee->hasRole(Role::COMMITTEE)) {
-            abort(403, 'Only selection committee members can review applications.');
+            abort(403, __('workflow.selection.errors.not_committee'));
         }
 
         return Application::query()
@@ -67,7 +67,7 @@ class SelectionService
     public function assertCanView(User $committee, Application $application): void
     {
         if (! $this->canView($committee, $application)) {
-            abort(403, 'This application is not available for your selection committee assignment.');
+            abort(403, __('workflow.selection.errors.not_assigned'));
         }
     }
 
@@ -84,7 +84,7 @@ class SelectionService
     public function saveScores(User $committee, Application $application, array $scores): Application
     {
         if (! $this->canScore($committee, $application)) {
-            abort(403, 'Scores can only be recorded by an assigned committee member while the application is under review.');
+            abort(403, __('workflow.selection.errors.scores_forbidden'));
         }
 
         $application->load('scholarship.criteria');
@@ -100,11 +100,10 @@ class SelectionService
 
                 if (! is_numeric($raw) || (float) $raw < 0 || (float) $raw > (float) $criterion->maximum_score) {
                     throw ValidationException::withMessages([
-                        'scores.'.$key => sprintf(
-                            '%s must be between 0 and %s.',
-                            $criterion->name,
-                            $criterion->maximum_score,
-                        ),
+                        'scores.'.$key => __('workflow.selection.errors.score_between', [
+                            'criterion' => $criterion->name,
+                            'max' => $criterion->maximum_score,
+                        ]),
                     ]);
                 }
 
@@ -127,7 +126,7 @@ class SelectionService
 
         if ($application->status !== ApplicationStatus::UNDER_REVIEW) {
             throw ValidationException::withMessages([
-                'decision' => 'A decision has already been recorded for this application.',
+                'decision' => __('workflow.selection.errors.already_decided'),
             ]);
         }
 
@@ -153,8 +152,8 @@ class SelectionService
     private function announceDecision(Application $application, Decision $decision, string $reason, User $committee): void
     {
         $params = [
-            'scholarship' => $application->scholarship->title,
-            'decision' => $decision->label(),
+            'scholarship' => $application->scholarship->getRawOriginal('title'),
+            'decision' => $decision->value,
             'reason' => $reason,
             'application' => (string) $application->id,
         ];

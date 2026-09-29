@@ -13,14 +13,7 @@ enum Role: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::ADMIN => 'Administrator',
-            self::STUDENT => 'Student',
-            self::GUARDIAN => 'Guardian',
-            self::SCHOOL_OFFICER => 'School Officer',
-            self::LOCAL_OFFICER => 'Local Education Officer',
-            self::COMMITTEE => 'Selection Committee Member',
-        };
+        return __('enum.role.'.$this->value);
     }
 
     /**

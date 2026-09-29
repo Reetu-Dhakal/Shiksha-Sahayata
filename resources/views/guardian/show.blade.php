@@ -4,13 +4,13 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-lg font-semibold text-slate-900">Guardian Profile</h1>
-    <p class="mt-1 text-sm text-slate-600">Manage your guardian details and the student profiles linked to your account.</p>
+    <h1 class="text-lg font-semibold text-slate-900">{{ __('profile.guardian.title') }}</h1>
+    <p class="mt-1 text-sm text-slate-600">{{ __('profile.guardian.intro') }}</p>
 </div>
 
 @unless ($guardian)
     <section class="rounded border border-slate-200 bg-white p-4">
-        <h2 class="text-sm font-semibold text-slate-900">Create guardian profile</h2>
+        <h2 class="text-sm font-semibold text-slate-900">{{ __('profile.guardian.create_heading') }}</h2>
         <form method="POST" action="{{ route('guardian.profile.store') }}" class="mt-4 grid gap-4 sm:grid-cols-2">
             @csrf
             <div>
@@ -20,8 +20,8 @@
                 @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label for="relationship" class="mb-1 block text-sm font-medium text-slate-700">Relationship *</label>
-                <input id="relationship" name="relationship" type="text" placeholder="Father / Mother / Guardian" value="{{ old('relationship') }}" required
+                <label for="relationship" class="mb-1 block text-sm font-medium text-slate-700">{{ __('profile.guardian.relationship') }} *</label>
+                <input id="relationship" name="relationship" type="text" placeholder="{{ __('profile.guardian.relationship_placeholder') }}" value="{{ old('relationship') }}" required
                        class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('relationship') border-red-400 @enderror">
                 @error('relationship')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
@@ -32,7 +32,7 @@
                 @error('phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label for="citizenship_number" class="mb-1 block text-sm font-medium text-slate-700">Citizenship number <span class="font-normal text-slate-400">({{ __('common.optional') }})</span></label>
+                <label for="citizenship_number" class="mb-1 block text-sm font-medium text-slate-700">{{ __('profile.guardian.citizenship_number') }} <span class="font-normal text-slate-400">({{ __('common.optional') }})</span></label>
                 <input id="citizenship_number" name="citizenship_number" type="text" value="{{ old('citizenship_number') }}"
                        class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('citizenship_number') border-red-400 @enderror">
                 @error('citizenship_number')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
@@ -44,7 +44,7 @@
                 @error('address')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div class="sm:col-span-2">
-                <button type="submit" class="rounded bg-blue-800 px-5 py-2 text-sm font-medium text-white hover:bg-blue-900">Create profile</button>
+                <button type="submit" class="rounded bg-blue-800 px-5 py-2 text-sm font-medium text-white hover:bg-blue-900">{{ __('profile.guardian.create_profile') }}</button>
             </div>
         </form>
     </section>
@@ -52,7 +52,7 @@
     <div class="grid gap-4 lg:grid-cols-2">
         <section class="rounded border border-slate-200 bg-white p-4" x-data="{ editing: false }">
             <div class="flex items-center justify-between">
-                <h2 class="text-sm font-semibold text-slate-900">Guardian details</h2>
+                <h2 class="text-sm font-semibold text-slate-900">{{ __('profile.guardian.details') }}</h2>
                 <button type="button" @click="editing = !editing"
                         class="text-xs font-medium text-blue-800 hover:underline">
                     <span x-text="editing ? '{{ __('common.cancel') }}' : '{{ __('common.edit') }}'">{{ __('common.edit') }}</span>
@@ -65,7 +65,7 @@
                     <dd class="text-right font-medium text-slate-800">{{ $guardian->name }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
-                    <dt class="text-slate-500">Relationship</dt>
+                    <dt class="text-slate-500">{{ __('profile.guardian.relationship') }}</dt>
                     <dd class="text-right font-medium text-slate-800">{{ $guardian->relationship }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
@@ -73,7 +73,7 @@
                     <dd class="text-right font-medium text-slate-800">{{ $guardian->phone }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
-                    <dt class="text-slate-500">Citizenship number</dt>
+                    <dt class="text-slate-500">{{ __('profile.guardian.citizenship_number') }}</dt>
                     <dd class="text-right font-medium text-slate-800">{{ $guardian->citizenship_number ?: '—' }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
@@ -93,7 +93,7 @@
                         @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="g_relationship" class="mb-1 block text-sm font-medium text-slate-700">Relationship *</label>
+                        <label for="g_relationship" class="mb-1 block text-sm font-medium text-slate-700">{{ __('profile.guardian.relationship') }} *</label>
                         <input id="g_relationship" name="relationship" type="text" value="{{ old('relationship', $guardian->relationship) }}" required
                                class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('relationship') border-red-400 @enderror">
                         @error('relationship')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
@@ -105,7 +105,7 @@
                         @error('phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="g_citizenship" class="mb-1 block text-sm font-medium text-slate-700">Citizenship number</label>
+                        <label for="g_citizenship" class="mb-1 block text-sm font-medium text-slate-700">{{ __('profile.guardian.citizenship_number') }}</label>
                         <input id="g_citizenship" name="citizenship_number" type="text" value="{{ old('citizenship_number', $guardian->citizenship_number) }}"
                                class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
                     </div>
@@ -122,29 +122,29 @@
         </section>
 
         <section class="rounded border border-slate-200 bg-white p-4">
-            <h2 class="text-sm font-semibold text-slate-900">Link a student profile</h2>
-            <p class="mt-1 text-xs text-slate-500">Enter the Scholar Student ID of your child to link their profile to your account.</p>
+            <h2 class="text-sm font-semibold text-slate-900">{{ __('profile.guardian.link_heading') }}</h2>
+            <p class="mt-1 text-xs text-slate-500">{{ __('profile.guardian.link_help') }}</p>
             <form method="POST" action="{{ route('guardian.students.link') }}" class="mt-3 flex flex-wrap gap-2">
                 @csrf
-                <label for="scholar_student_id" class="sr-only">Scholar Student ID</label>
+                <label for="scholar_student_id" class="sr-only">{{ __('profile.guardian.scholar_id_label') }}</label>
                 <input id="scholar_student_id" name="scholar_student_id" type="text" placeholder="SS-2026-0001" value="{{ old('scholar_student_id') }}"
                        class="w-48 rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('scholar_student_id') border-red-400 @enderror">
-                <button type="submit" class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900">Link</button>
+                <button type="submit" class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900">{{ __('profile.guardian.link') }}</button>
             </form>
             @error('scholar_student_id')<p class="mt-2 text-xs text-red-600">{{ $message }}</p>@enderror
         </section>
     </div>
 
     <section class="mt-4 rounded border border-slate-200 bg-white p-4">
-        <h2 class="text-sm font-semibold text-slate-900">Linked students</h2>
+        <h2 class="text-sm font-semibold text-slate-900">{{ __('profile.guardian.linked_students') }}</h2>
         <div class="mt-3 overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 text-xs uppercase text-slate-500">
                     <tr>
-                        <th class="py-2 pr-4">Scholar Student ID</th>
+                        <th class="py-2 pr-4">{{ __('profile.guardian.scholar_id_label') }}</th>
                         <th class="py-2 pr-4">{{ __('common.name') }}</th>
-                        <th class="py-2 pr-4">Grade</th>
-                        <th class="py-2 pr-4">School</th>
+                        <th class="py-2 pr-4">{{ __('profile.guardian.table_grade') }}</th>
+                        <th class="py-2 pr-4">{{ __('profile.guardian.table_school') }}</th>
                         <th class="py-2">{{ __('common.status') }}</th>
                     </tr>
                 </thead>
@@ -157,16 +157,16 @@
                             <td class="py-2 pr-4 text-slate-700">{{ $student->school?->name ?? '—' }}</td>
                             <td class="py-2">
                                 @if ($student->isVerified())
-                                    <x-status-badge type="success" label="Verified" />
+                                    <x-status-badge type="success" :label="__('profile.guardian.verified')" />
                                 @else
-                                    <x-status-badge type="warning" label="Unverified" />
+                                    <x-status-badge type="warning" :label="__('profile.guardian.unverified')" />
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="5" class="py-6 text-center text-sm text-slate-500">
-                                No student profiles are linked to your account yet.
+                                {{ __('profile.guardian.empty') }}
                             </td>
                         </tr>
                     @endforelse

@@ -30,7 +30,7 @@ class ApplicationService
 
         if (! $scholarship->isAcceptingApplications()) {
             throw ValidationException::withMessages([
-                'scholarship' => 'Applications are not open for this scholarship.',
+                'scholarship' => __('application.errors.not_open'),
             ]);
         }
 
@@ -41,7 +41,7 @@ class ApplicationService
 
         if ($existing !== null) {
             throw ValidationException::withMessages([
-                'scholarship' => 'An application for this student and scholarship already exists.',
+                'scholarship' => __('application.errors.duplicate'),
             ]);
         }
 
@@ -72,7 +72,7 @@ class ApplicationService
 
         if (! $application->isEditable()) {
             throw ValidationException::withMessages([
-                'application' => 'This application can no longer be edited.',
+                'application' => __('application.errors.not_editable'),
             ]);
         }
 
@@ -88,13 +88,13 @@ class ApplicationService
 
         if (! $application->isEditable()) {
             throw ValidationException::withMessages([
-                'application' => 'This application has already been submitted.',
+                'application' => __('application.errors.already_submitted'),
             ]);
         }
 
         if (! $application->scholarship->isAcceptingApplications()) {
             throw ValidationException::withMessages([
-                'application' => 'The application deadline has passed, so this application cannot be submitted.',
+                'application' => __('application.errors.deadline_passed'),
             ]);
         }
 
@@ -107,7 +107,7 @@ class ApplicationService
 
         if ($missing->isNotEmpty()) {
             throw ValidationException::withMessages([
-                'documents' => 'Upload the required documents before submitting: '.$missing->implode(', ').'.',
+                'documents' => __('application.errors.missing_documents', ['list' => $missing->implode(', ')]),
             ]);
         }
 
@@ -119,7 +119,7 @@ class ApplicationService
         ]);
 
         $params = [
-            'scholarship' => $application->scholarship->title,
+            'scholarship' => $application->scholarship->getRawOriginal('title'),
             'student' => $application->student->name,
             'application' => (string) $application->id,
         ];
@@ -136,7 +136,7 @@ class ApplicationService
             sprintf(
                 'Application #%d for "%s" submitted by %s.',
                 $application->id,
-                $application->scholarship->title,
+                $application->scholarship->getRawOriginal('title'),
                 $actor->email,
             ),
             $application,
@@ -154,7 +154,7 @@ class ApplicationService
 
         if ($application->status !== ApplicationStatus::DRAFT) {
             throw ValidationException::withMessages([
-                'application' => 'Only draft applications can be withdrawn.',
+                'application' => __('application.errors.only_draft'),
             ]);
         }
 
@@ -207,7 +207,7 @@ class ApplicationService
     public function assertCanActFor(User $actor, Student $student, Scholarship $scholarship): void
     {
         if (! $this->canActFor($actor, $student, $scholarship)) {
-            abort(403, 'You are not allowed to act on this application.');
+            abort(403, __('application.errors.forbidden'));
         }
     }
 

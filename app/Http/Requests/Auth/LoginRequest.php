@@ -31,17 +31,6 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'login.required' => 'Please enter your email or phone number.',
-            'password.required' => 'Please enter your password.',
-        ];
-    }
-
-    /**
      * Authenticate the request and throw a validation exception on failure.
      */
     public function authenticate(): void

@@ -21,13 +21,19 @@ class ReportController extends Controller
 {
     public function index(): View
     {
+        $scholarshipTitles = [];
+
+        foreach (Scholarship::query()->get() as $scholarship) {
+            $scholarshipTitles[$scholarship->getRawOriginal('title')] = $scholarship->title;
+        }
+
         return view('admin.reports.index', [
             'totals' => [
-                ['label' => 'Students', 'value' => Student::query()->count()],
-                ['label' => 'Applications', 'value' => Application::query()->count()],
-                ['label' => 'Published scholarships', 'value' => Scholarship::query()->where('status', 'PUBLISHED')->count()],
-                ['label' => 'Awards issued', 'value' => Award::query()->count()],
-                ['label' => 'Users', 'value' => User::query()->count()],
+                ['label' => __('admin.reports.students'), 'value' => Student::query()->count()],
+                ['label' => __('admin.reports.applications'), 'value' => Application::query()->count()],
+                ['label' => __('admin.reports.published_scholarships'), 'value' => Scholarship::query()->where('status', 'PUBLISHED')->count()],
+                ['label' => __('admin.reports.awards_issued'), 'value' => Award::query()->count()],
+                ['label' => __('admin.reports.users'), 'value' => User::query()->count()],
             ],
             'byStatus' => $this->countBy(Application::query(), 'status')
                 ->mapWithKeys(fn (int $count, string $status): array => [
@@ -36,7 +42,9 @@ class ReportController extends Controller
             'byScholarship' => $this->countBy(
                 Application::query()->join('scholarships', 'scholarships.id', '=', 'applications.scholarship_id'),
                 'scholarships.title',
-            ),
+            )->mapWithKeys(fn (int $count, string $title): array => [
+                $scholarshipTitles[$title] ?? $title => $count,
+            ]),
             'byDistrict' => $this->countBy(
                 Application::query()->join('students', 'students.id', '=', 'applications.student_id'),
                 'students.district',
@@ -81,7 +89,7 @@ class ReportController extends Controller
                     foreach ($applications as $application) {
                         fputcsv($handle, [
                             $application->id,
-                            $application->scholarship->title,
+                            $application->scholarship->getRawOriginal('title'),
                             $application->student->scholar_student_id,
                             $application->student->name,
                             $application->student->school?->name,

@@ -36,7 +36,7 @@ class ApplicationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'statement.min' => 'Please write at least 80 characters explaining your need and goals.',
+            'statement.min' => __('admin.validation.application_statement_min'),
         ];
     }
 }

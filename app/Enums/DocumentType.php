@@ -16,17 +16,7 @@ enum DocumentType: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::BIRTH_REGISTRATION => 'Birth registration certificate',
-            self::SCHOOL_VERIFICATION => 'School verification letter',
-            self::INCOME_CERTIFICATE => 'Income certificate',
-            self::CASTE_CERTIFICATE => 'Caste / category certificate',
-            self::CITIZENSHIP_GUARDIAN => 'Guardian citizenship certificate',
-            self::DISABILITY_CERTIFICATE => 'Disability certificate',
-            self::ACADEMIC_REPORT => 'Academic report / transcript',
-            self::PHOTO => 'Passport size photo',
-            self::OTHER => 'Other document',
-        };
+        return __('enum.document_type.'.$this->value);
     }
 
     /**

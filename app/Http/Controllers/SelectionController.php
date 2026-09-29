@@ -53,7 +53,7 @@ class SelectionController extends Controller
 
         return redirect()
             ->route('selection.show', $application)
-            ->with('status', 'Scores saved.');
+            ->with('status', __('workflow.selection.flash.scores_saved'));
     }
 
     public function decide(SelectionDecisionRequest $request, Application $application): RedirectResponse
@@ -69,6 +69,6 @@ class SelectionController extends Controller
 
         return redirect()
             ->route('selection.show', $application)
-            ->with('status', 'Decision recorded: '.$decision->label().'.');
+            ->with('status', __('workflow.selection.flash.decision_recorded', ['decision' => $decision->label()]));
     }
 }

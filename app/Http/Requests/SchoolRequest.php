@@ -39,7 +39,7 @@ class SchoolRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'contact_phone.regex' => 'Please enter a valid phone number (digits, +, - or spaces only).',
+            'contact_phone.regex' => __('admin.validation.school_contact_phone_regex'),
         ];
     }
 }

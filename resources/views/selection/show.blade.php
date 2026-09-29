@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Selection review')
+@section('title', __('workflow.selection.show.title'))
 
 @php
     $scoreMap = [];
@@ -25,7 +25,7 @@
         <h1 class="mt-2 text-lg font-semibold text-slate-900">{{ $application->scholarship->title }}</h1>
         <p class="mt-1 text-sm text-slate-600">
             {{ $application->student->name }} · {{ $application->student->scholar_student_id }}
-            · {{ $application->student->school?->name ?? 'No school' }}
+            · {{ $application->student->school?->name ?? __('workflow.common.no_school') }}
         </p>
         <div class="mt-2 flex flex-wrap gap-2">
             <x-status-badge :type="$application->status->badgeType()" :label="$application->status->label()" />
@@ -36,19 +36,19 @@
     </div>
 
     <div class="text-right">
-        <p class="text-xs uppercase tracking-wide text-slate-500">Weighted score</p>
+        <p class="text-xs uppercase tracking-wide text-slate-500">{{ __('workflow.selection.show.weighted_score') }}</p>
         <p class="text-xl font-semibold text-slate-900">{{ number_format($weightedTotal, 2) }}%</p>
-        <p class="text-xs text-slate-500">of {{ rtrim(rtrim(number_format($application->scholarship->totalWeight(), 2), '0'), '.') }}% available</p>
+        <p class="text-xs text-slate-500">{{ __('workflow.selection.show.available', ['weight' => rtrim(rtrim(number_format($application->scholarship->totalWeight(), 2), '0'), '.')]) }}</p>
     </div>
 </div>
 
 @if ($application->decision)
     <div class="mb-6 rounded border border-slate-200 bg-white p-4">
-        <h2 class="text-sm font-semibold text-slate-900">Recorded decision: {{ $application->decision->decision->label() }}</h2>
+        <h2 class="text-sm font-semibold text-slate-900">{{ __('workflow.selection.show.recorded_decision', ['decision' => $application->decision->decision->label()]) }}</h2>
         <p class="mt-1 text-sm text-slate-700">{{ $application->decision->reason }}</p>
         <p class="mt-1 text-xs text-slate-500">
-            {{ $application->decision->decidedBy?->name ?: 'Committee' }}
-            @if ($application->decision->decided_at) · {{ $application->decision->decided_at->format('j M Y, H:i') }} @endif
+            {{ $application->decision->decidedBy?->name ?: __('workflow.common.committee') }}
+            @if ($application->decision->decided_at) · {{ format_date($application->decision->decided_at, 'j M Y, H:i') }} @endif
         </p>
     </div>
 @endif
@@ -73,12 +73,12 @@
                  },
              }">
         <div class="flex flex-wrap items-center justify-between gap-2">
-            <h2 class="text-sm font-semibold text-slate-900">Criteria scoring</h2>
-            <span class="text-sm text-slate-600">Weighted total: <strong x-text="total().toFixed(2)">0.00</strong>%</span>
+            <h2 class="text-sm font-semibold text-slate-900">{{ __('workflow.selection.show.criteria_scoring') }}</h2>
+            <span class="text-sm text-slate-600">{{ __('workflow.selection.show.weighted_total') }} <strong x-text="total().toFixed(2)">0.00</strong>%</span>
         </div>
 
         @if ($application->scholarship->criteria->isEmpty())
-            <p class="mt-3 text-sm text-slate-500">This scholarship has no scoring criteria configured.</p>
+            <p class="mt-3 text-sm text-slate-500">{{ __('workflow.selection.show.no_criteria') }}</p>
         @elseif ($canScore)
             <form method="POST" action="{{ route('selection.scores', $application) }}" class="mt-4">
                 @csrf
@@ -92,18 +92,18 @@
                                 <p class="text-xs text-slate-500">{{ $criterion->description }}</p>
                             </div>
                             <div class="sm:col-span-3">
-                                <label class="mb-1 block text-xs font-medium text-slate-600">Score (max {{ $criterion->maximum_score }})</label>
+                                <label class="mb-1 block text-xs font-medium text-slate-600">{{ __('workflow.selection.show.score_max', ['max' => $criterion->maximum_score]) }}</label>
                                 <input type="number" step="0.5" min="0" max="{{ $criterion->maximum_score }}"
                                        name="scores[{{ $criterion->id }}]" x-model="scores[{{ $criterion->id }}]"
                                        class="w-full rounded border border-slate-300 px-2 py-1.5 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
                                 @error('scores.'.$criterion->id)<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                             </div>
                             <div class="sm:col-span-2">
-                                <p class="mb-1 text-xs font-medium text-slate-600">Weight</p>
+                                <p class="mb-1 text-xs font-medium text-slate-600">{{ __('workflow.selection.show.weight') }}</p>
                                 <p class="text-sm text-slate-800">{{ rtrim(rtrim(number_format((float) $criterion->weight, 2), '0'), '.') }}%</p>
                             </div>
                             <div class="sm:col-span-2">
-                                <p class="mb-1 text-xs font-medium text-slate-600">Contribution</p>
+                                <p class="mb-1 text-xs font-medium text-slate-600">{{ __('workflow.selection.show.contribution') }}</p>
                                 <p class="text-sm font-medium text-slate-900" x-text="contribution({{ $criterion->id }}).toFixed(2)+'%'">0.00%</p>
                             </div>
                         </div>
@@ -111,9 +111,9 @@
                 </div>
 
                 <div class="mt-4 flex items-center justify-between gap-3">
-                    <p class="text-xs text-slate-500">Weighted contribution = (score ÷ maximum score) × weight.</p>
+                    <p class="text-xs text-slate-500">{{ __('workflow.selection.show.formula') }}</p>
                     <button type="submit" class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900">
-                        Save scores
+                        {{ __('workflow.selection.show.save_scores') }}
                     </button>
                 </div>
             </form>
@@ -122,53 +122,53 @@
                 @csrf
                 @method('PATCH')
 
-                <h3 class="text-sm font-semibold text-slate-900">Record decision</h3>
-                <p class="mt-1 text-xs text-slate-500">Decisions are final for this round. The reason is visible to the applicant.</p>
+                <h3 class="text-sm font-semibold text-slate-900">{{ __('workflow.selection.show.record_decision') }}</h3>
+                <p class="mt-1 text-xs text-slate-500">{{ __('workflow.selection.show.decision_help') }}</p>
 
                 <div class="mt-3 grid gap-3 sm:grid-cols-3">
-                    @foreach (['SELECTED' => 'Selected', 'WAITLISTED' => 'Waitlisted', 'REJECTED' => 'Rejected'] as $value => $label)
+                    @foreach ([\App\Enums\Decision::SELECTED, \App\Enums\Decision::WAITLISTED, \App\Enums\Decision::REJECTED] as $option)
                         <label class="flex items-center gap-2 rounded border border-slate-200 px-3 py-2 text-sm">
-                            <input type="radio" name="decision" value="{{ $value }}" required class="border-slate-300"
-                                   @checked(old('decision') === $value || ($value === 'SELECTED' && old('decision') === null))>
-                            <span>{{ $label }}</span>
+                            <input type="radio" name="decision" value="{{ $option->value }}" required class="border-slate-300"
+                                   @checked(old('decision') === $option->value || ($option === \App\Enums\Decision::SELECTED && old('decision') === null))>
+                            <span>{{ $option->label() }}</span>
                         </label>
                     @endforeach
                 </div>
                 @error('decision')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
 
-                <label for="reason" class="mb-1 mt-3 block text-xs font-medium text-slate-600">Reason *</label>
+                <label for="reason" class="mb-1 mt-3 block text-xs font-medium text-slate-600">{{ __('workflow.selection.show.reason_required') }}</label>
                 <textarea id="reason" name="reason" rows="3" required
-                          placeholder="Explain why this decision was made (minimum 10 characters)."
+                          placeholder="{{ __('workflow.selection.show.reason_placeholder') }}"
                           class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">{{ old('reason') }}</textarea>
                 @error('reason')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
 
                 <button type="submit" class="mt-3 rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900"
-                        onclick="return confirm('Record this decision?');">
-                    Record decision
+                        onclick="return confirm('{{ __('workflow.selection.show.confirm_decision') }}');">
+                    {{ __('workflow.selection.show.record_decision') }}
                 </button>
             </form>
         @else
-            <p class="mt-3 text-sm text-slate-500">Scoring is closed because a decision has been recorded.</p>
+            <p class="mt-3 text-sm text-slate-500">{{ __('workflow.selection.show.scoring_closed') }}</p>
         @endif
 
-        <h2 class="mt-6 text-sm font-semibold text-slate-900">Applicant statement</h2>
+        <h2 class="mt-6 text-sm font-semibold text-slate-900">{{ __('workflow.common.applicant_statement') }}</h2>
         <p class="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-700">{{ $application->statement }}</p>
 
         <div class="mt-4 grid gap-3 border-t border-slate-100 pt-4 sm:grid-cols-4">
             <div>
-                <p class="text-xs text-slate-500">Current grade</p>
+                <p class="text-xs text-slate-500">{{ __('workflow.common.current_grade') }}</p>
                 <p class="mt-1 text-sm font-medium text-slate-900">{{ $application->current_grade ?? '—' }}</p>
             </div>
             <div>
-                <p class="text-xs text-slate-500">GPA</p>
+                <p class="text-xs text-slate-500">{{ __('workflow.common.gpa') }}</p>
                 <p class="mt-1 text-sm font-medium text-slate-900">{{ $application->grade_point_average ?? '—' }}</p>
             </div>
             <div>
-                <p class="text-xs text-slate-500">Category</p>
+                <p class="text-xs text-slate-500">{{ __('workflow.common.category') }}</p>
                 <p class="mt-1 text-sm font-medium text-slate-900">{{ $application->student->student_category?->label() ?? '—' }}</p>
             </div>
             <div>
-                <p class="text-xs text-slate-500">District</p>
+                <p class="text-xs text-slate-500">{{ __('workflow.common.district') }}</p>
                 <p class="mt-1 text-sm font-medium text-slate-900">{{ $application->student->district ?: '—' }}</p>
             </div>
         </div>
@@ -176,9 +176,9 @@
 
     <aside class="space-y-6">
         <section class="rounded border border-slate-200 bg-white p-4">
-            <h2 class="text-sm font-semibold text-slate-900">Verification record</h2>
+            <h2 class="text-sm font-semibold text-slate-900">{{ __('workflow.selection.show.verification_record') }}</h2>
             @if ($application->verifications->isEmpty())
-                <p class="mt-2 text-sm text-slate-500">No verification records.</p>
+                <p class="mt-2 text-sm text-slate-500">{{ __('workflow.selection.show.no_verification_records') }}</p>
             @else
                 <ul class="mt-2 space-y-2">
                     @foreach ($application->verifications as $record)
@@ -195,16 +195,16 @@
         </section>
 
         <section class="rounded border border-slate-200 bg-white p-4">
-            <h2 class="text-sm font-semibold text-slate-900">Documents</h2>
+            <h2 class="text-sm font-semibold text-slate-900">{{ __('workflow.common.documents') }}</h2>
             @if ($application->documents->isEmpty())
-                <p class="mt-2 text-sm text-slate-500">No documents uploaded.</p>
+                <p class="mt-2 text-sm text-slate-500">{{ __('workflow.common.no_documents') }}</p>
             @else
                 <ul class="mt-2 space-y-2 text-sm">
                     @foreach ($application->documents as $document)
                         <li class="flex items-center justify-between gap-2">
-                            <span class="text-slate-700">{{ $document->document_type }}</span>
+                            <span class="text-slate-700">{{ \App\Enums\DocumentType::from($document->document_type)->label() }}</span>
                             <a href="{{ route('applications.documents.download', [$application, $document->id]) }}"
-                               class="text-xs font-medium text-blue-800 hover:underline">Download</a>
+                               class="text-xs font-medium text-blue-800 hover:underline">{{ __('workflow.common.download') }}</a>
                         </li>
                     @endforeach
                 </ul>

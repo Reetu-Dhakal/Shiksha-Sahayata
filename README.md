@@ -58,6 +58,8 @@ Administratively, scholarship processing requires coordination between students,
 - Disbursement status tracking (administrative only — no real payments).
 - Immutable audit log of important actions.
 - Role-specific dashboards built from real database data (never fake statistics).
+- **Fully bilingual (English ⇄ Nepali):** every screen, form, validation message, status badge, date and seeded scholarship description switches with the language toggle. Nepali is Devanagari script, no mixed-language screens.
+
 
 ---
 
@@ -190,7 +192,26 @@ DB_PASSWORD=
 
 ---
 
-## 11. Running the Application
+## 11. Language (English / Nepali)
+
+The whole interface is bilingual. Switch with the **language button** in the header (or `POST /locale/{locale}`); the choice is stored in the session and applied by the `SetLocale` middleware (`en` default, `np` = Nepali).
+
+```text
+lang/en/*.php   # English (source of truth for feature-test strings)
+lang/np/*.php   # Nepali (Devanagari)
+lang/np.json    # JSON translations
+```
+
+- All UI text lives in `lang/{en,np}/*.php` — no hardcoded strings in Blade or PHP.
+- Scholarship and its criteria/rules/documents carry optional Nepali columns (`title_np`, `description_np`, `provider_np`, `name_np`), edited in the admin scholarship form and rendered automatically from the accessors when the locale is `np`.
+- Display dates use the `format_date()` helper so Nepali month names render correctly; machine formats (`Y-m-d`) are unchanged.
+- Notifications, enum labels and statuses are translated at read time, so the reader's language wins.
+- Deliberate English-only leftovers: the PDF award letter (dompdf has no Devanagari font), CSV export headers/rows, and stored audit-log descriptions.
+
+---
+
+## 12. Running the Application
+
 
 ```bash
 php artisan serve          # http://localhost:8000
@@ -201,7 +222,7 @@ For a production-style build: `npm run build && php artisan optimize`.
 
 ---
 
-## 12. Testing
+## 13. Testing
 
 ```bash
 php artisan test
@@ -215,7 +236,7 @@ scoring, appeals, award generation and public verification privacy.
 
 ---
 
-## 13. Demo Accounts
+## 14. Demo Accounts
 
 All seeded accounts use the password `password`. **All seed data is fictional.**
 
@@ -230,10 +251,11 @@ All seeded accounts use the password `password`. **All seed data is fictional.**
 
 ---
 
-## 14. Project Structure
+## 15. Project Structure
 
 ```text
 app/
+ ├── helpers.php               # format_date(), pick_translation()
  ├── Http/Controllers/      # Thin HTTP layer (public + Admin/)
  ├── Http/Middleware/        # Role + locale middleware
  ├── Http/Requests/         # Form Request validation
@@ -246,6 +268,9 @@ database/
  ├── migrations/            # Schema with FKs, indexes, constraints
  ├── seeders/               # Fictional demo data
  └── factories/
+lang/
+ ├── en/                    # English strings (UI source of truth)
+ └── np/                    # Nepali strings (Devanagari)
 resources/views/            # Blade components, layouts, pages per role
 routes/web.php              # Public, auth and role-grouped routes
 tests/Feature, tests/Unit   # PHPUnit tests
@@ -253,7 +278,7 @@ tests/Feature, tests/Unit   # PHPUnit tests
 
 ---
 
-## 15. Security & Privacy
+## 16. Security & Privacy
 
 - Hashed passwords (bcrypt), CSRF protection, session security, rate-limited login.
 - Form Request validation for every write endpoint.
@@ -266,7 +291,7 @@ tests/Feature, tests/Unit   # PHPUnit tests
 
 ---
 
-## 16. Scope
+## 17. Scope
 
 **In scope:** discovery, applications, verification, selection scoring, appeals, notifications, awards with QR verification, disbursement status tracking, audit trail, role dashboards/reports, assisted applications.
 
@@ -274,7 +299,7 @@ tests/Feature, tests/Unit   # PHPUnit tests
 
 ---
 
-## 17. Future Enhancements
+## 18. Future Enhancements
 
 Clearly labelled as **future work only** — none of these currently exist in the project:
 
@@ -286,13 +311,13 @@ Clearly labelled as **future work only** — none of these currently exist in th
 
 ---
 
-## 18. Academic Context
+## 19. Academic Context
 
 Shiksha Sahayata is developed as a BSc CSIT academic project. It demonstrates a complete, coherent e-governance workflow using a single Laravel application and a single MySQL database, with an emphasis on maintainability, security, privacy and honest documentation.
 
 ---
 
-## 19. Development Progress
+## 20. Development Progress
 
 Incremental build log (each phase committed and pushed with passing tests):
 
@@ -313,5 +338,6 @@ Incremental build log (each phase committed and pushed with passing tests):
 | 13 | Assisted applications: school/local officers and admins fill applications on behalf of students inside their jurisdiction, flagged as assisted | Done |
 | 14 | Dashboards and reports: role-specific live statistics, workflow queues on every dashboard, admin report aggregates and applications CSV export | Done |
 | 15 | Final polish: documentation aligned with the delivered system (services, routes, notifications, audit, reports), full test suite + seed verification | Done |
+| 16 | Full localisation: every screen, form, validation message, status/enum label, date and seeded scholarship text extracted to `lang/{en,np}`; Nepali DB content columns for scholarships; language switch on public, government and dashboard layouts; `LocaleTest` guards against mixed-language rendering | Done |
 
 Seeded demo: 2 published scholarships (Merit-cum-Means, Remote Area Girls), 1 draft, criteria totalling 100%, required documents and an assigned selection committee.

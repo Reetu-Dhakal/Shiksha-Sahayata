@@ -26,6 +26,7 @@ class ScholarshipController extends Controller
             $like = '%'.$filters['q'].'%';
             $query->where(function (Builder $builder) use ($like): void {
                 $builder->where('title', 'like', $like)
+                    ->orWhere('title_np', 'like', $like)
                     ->orWhere('provider', 'like', $like)
                     ->orWhere('description', 'like', $like);
             });

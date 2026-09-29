@@ -34,7 +34,7 @@ class VerificationDecisionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'remarks.min' => 'Explain the reason in at least 10 characters — the applicant will see it.',
+            'remarks.min' => __('admin.validation.verification_remarks_min'),
         ];
     }
 }

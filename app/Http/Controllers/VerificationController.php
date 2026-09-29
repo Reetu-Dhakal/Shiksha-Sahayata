@@ -52,7 +52,7 @@ class VerificationController extends Controller
 
         return redirect()
             ->route('verifications.show', $application)
-            ->with('status', 'Application taken up for school verification.');
+            ->with('status', __('workflow.verification.flash.started'));
     }
 
     public function approve(VerificationDecisionRequest $request, Application $application): RedirectResponse
@@ -65,7 +65,7 @@ class VerificationController extends Controller
 
         return redirect()
             ->route('verifications.show', $application)
-            ->with('status', 'Verification recorded. The application moves to the next stage.');
+            ->with('status', __('workflow.verification.flash.approved'));
     }
 
     public function returnForCorrection(VerificationDecisionRequest $request, Application $application): RedirectResponse
@@ -78,6 +78,6 @@ class VerificationController extends Controller
 
         return redirect()
             ->route('verifications.show', $application)
-            ->with('status', 'Application returned to the applicant for correction.');
+            ->with('status', __('workflow.verification.flash.returned'));
     }
 }

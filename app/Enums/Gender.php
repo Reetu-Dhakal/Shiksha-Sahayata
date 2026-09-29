@@ -10,19 +10,6 @@ enum Gender: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::MALE => 'Male',
-            self::FEMALE => 'Female',
-            self::OTHER => 'Other',
-        };
-    }
-
-    public function labelNp(): string
-    {
-        return match ($this) {
-            self::MALE => 'पुरुष',
-            self::FEMALE => 'महिला',
-            self::OTHER => 'अन्य',
-        };
+        return __('enum.gender.'.$this->value);
     }
 }

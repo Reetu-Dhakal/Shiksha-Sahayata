@@ -21,6 +21,14 @@
                 @endif
                 <a href="{{ route('dashboard') }}" class="hidden text-sm text-slate-600 hover:text-blue-800 md:block">{{ __('nav.dashboard') }}</a>
 
+                <form method="POST" action="{{ route('locale.update', app()->getLocale() === 'np' ? 'en' : 'np') }}">
+                    @csrf
+                    <label for="lang-switch" class="sr-only">{{ __('common.language') }}</label>
+                    <button id="lang-switch" type="submit" class="rounded border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50">
+                        {{ __('common.switch_language') }}
+                    </button>
+                </form>
+
                 <div class="relative" x-data="{ open: false }">
                     <button type="button" @click="open = !open" @click.outside="open = false"
                             class="flex items-center gap-2 rounded border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50">

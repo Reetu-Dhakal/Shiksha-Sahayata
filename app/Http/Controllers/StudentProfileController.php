@@ -43,7 +43,7 @@ class StudentProfileController extends Controller
 
         return redirect()
             ->route('profile.show')
-            ->with('status', 'Your student profile has been created. Your Scholar Student ID has been generated.');
+            ->with('status', __('profile.flash.created'));
     }
 
     public function edit(Request $request): View|RedirectResponse
@@ -75,7 +75,7 @@ class StudentProfileController extends Controller
 
         return redirect()
             ->route('profile.show')
-            ->with('status', 'Your student profile has been updated.');
+            ->with('status', __('profile.flash.updated'));
     }
 
     private function formView(?Student $student, Request $request): View

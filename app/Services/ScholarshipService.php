@@ -21,8 +21,11 @@ class ScholarshipService
         return DB::transaction(function () use ($admin, $data) {
             $scholarship = Scholarship::query()->create([
                 'title' => $data['title'],
+                'title_np' => $data['title_np'] ?? null,
                 'description' => $data['description'],
+                'description_np' => $data['description_np'] ?? null,
                 'provider' => $data['provider'],
+                'provider_np' => $data['provider_np'] ?? null,
                 'application_start' => $data['application_start'],
                 'application_deadline' => $data['application_deadline'],
                 'education_level' => $data['education_level'] ?? null,
@@ -47,8 +50,11 @@ class ScholarshipService
         return DB::transaction(function () use ($scholarship, $data) {
             $scholarship->update([
                 'title' => $data['title'],
+                'title_np' => $data['title_np'] ?? null,
                 'description' => $data['description'],
+                'description_np' => $data['description_np'] ?? null,
                 'provider' => $data['provider'],
+                'provider_np' => $data['provider_np'] ?? null,
                 'application_start' => $data['application_start'],
                 'application_deadline' => $data['application_deadline'],
                 'education_level' => $data['education_level'] ?? null,
@@ -91,7 +97,7 @@ class ScholarshipService
 
         if (! in_array($current, $allowed, true)) {
             throw ValidationException::withMessages([
-                'status' => sprintf('A scholarship cannot move from %s to %s.', $current->label(), $target->label()),
+                'status' => __('admin.errors.status_transition', ['from' => $current->label(), 'to' => $target->label()]),
             ]);
         }
 
@@ -119,31 +125,31 @@ class ScholarshipService
 
         if ($scholarship->application_deadline->startOfDay()->lt(now()->startOfDay())) {
             throw ValidationException::withMessages([
-                'application_deadline' => 'A scholarship cannot be published after its application deadline.',
+                'application_deadline' => __('admin.errors.deadline_passed'),
             ]);
         }
 
         if ($scholarship->application_start->startOfDay()->gt($scholarship->application_deadline->startOfDay())) {
             throw ValidationException::withMessages([
-                'application_deadline' => 'The application deadline must be on or after the start date.',
+                'application_deadline' => __('admin.errors.deadline_before_start'),
             ]);
         }
 
         if ($scholarship->criteria->isEmpty()) {
             throw ValidationException::withMessages([
-                'criteria' => 'At least one selection criterion is required before publishing.',
+                'criteria' => __('admin.errors.criteria_required'),
             ]);
         }
 
         if (abs($scholarship->totalWeight() - 100.0) > 0.01) {
             throw ValidationException::withMessages([
-                'criteria' => sprintf('Criterion weights must total 100%% before publishing (currently %.2f%%).', $scholarship->totalWeight()),
+                'criteria' => __('admin.errors.weights_total', ['weight' => sprintf('%.2f', $scholarship->totalWeight())]),
             ]);
         }
 
         if ($scholarship->requiredDocuments->where('is_required', true)->isEmpty()) {
             throw ValidationException::withMessages([
-                'documents' => 'At least one required document must be defined before publishing.',
+                'documents' => __('admin.errors.documents_required'),
             ]);
         }
     }
@@ -161,7 +167,9 @@ class ScholarshipService
             foreach (array_values($data['criteria'] ?? []) as $index => $criterion) {
                 $scholarship->criteria()->create([
                     'name' => $criterion['name'],
+                    'name_np' => $criterion['name_np'] ?? null,
                     'description' => $criterion['description'] ?? null,
+                    'description_np' => $criterion['description_np'] ?? null,
                     'weight' => $criterion['weight'],
                     'maximum_score' => $criterion['maximum_score'],
                     'order' => $index,
@@ -176,6 +184,7 @@ class ScholarshipService
                 $scholarship->requiredDocuments()->create([
                     'document_type' => $document['document_type'],
                     'description' => $document['description'] ?? null,
+                    'description_np' => $document['description_np'] ?? null,
                     'is_required' => (bool) ($document['is_required'] ?? false),
                     'order' => $index,
                 ]);
@@ -191,6 +200,7 @@ class ScholarshipService
                     'operator' => $rule['operator'],
                     'value' => $rule['value'],
                     'description' => $rule['description'] ?? null,
+                    'description_np' => $rule['description_np'] ?? null,
                     'order' => $index,
                 ]);
             }

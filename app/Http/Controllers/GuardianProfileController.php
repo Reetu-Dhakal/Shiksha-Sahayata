@@ -33,7 +33,7 @@ class GuardianProfileController extends Controller
             'citizenship_number' => ['nullable', 'string', 'max:40'],
             'address' => ['nullable', 'string', 'max:255'],
         ], [
-            'phone.regex' => 'Please enter a valid phone number (digits, +, - or spaces only).',
+            'phone.regex' => __('validation.custom.phone.regex'),
         ]);
 
         Guardian::query()->create([
@@ -43,7 +43,7 @@ class GuardianProfileController extends Controller
 
         return redirect()
             ->route('guardian.profile.show')
-            ->with('status', 'Your guardian profile has been created.');
+            ->with('status', __('profile.flash.guardian_created'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -59,14 +59,14 @@ class GuardianProfileController extends Controller
             'citizenship_number' => ['nullable', 'string', 'max:40'],
             'address' => ['nullable', 'string', 'max:255'],
         ], [
-            'phone.regex' => 'Please enter a valid phone number (digits, +, - or spaces only).',
+            'phone.regex' => __('validation.custom.phone.regex'),
         ]);
 
         $guardian->update($data);
 
         return redirect()
             ->route('guardian.profile.show')
-            ->with('status', 'Your guardian profile has been updated.');
+            ->with('status', __('profile.flash.guardian_updated'));
     }
 
     /**
@@ -79,7 +79,7 @@ class GuardianProfileController extends Controller
         if ($guardian === null) {
             return redirect()
                 ->route('guardian.profile.show')
-                ->withErrors(['scholar_student_id' => 'Please create your guardian profile first.']);
+                ->withErrors(['scholar_student_id' => __('profile.errors.guardian_required')]);
         }
 
         $data = $request->validate([
@@ -91,15 +91,15 @@ class GuardianProfileController extends Controller
             ->first();
 
         if ($student === null) {
-            return back()->withErrors(['scholar_student_id' => 'No student profile matches that Scholar Student ID.']);
+            return back()->withErrors(['scholar_student_id' => __('profile.errors.student_not_found')]);
         }
 
         if ($student->guardian_id !== null && $student->guardian_id !== $guardian->id) {
-            return back()->withErrors(['scholar_student_id' => 'This student profile is already linked to another guardian.']);
+            return back()->withErrors(['scholar_student_id' => __('profile.errors.already_linked')]);
         }
 
         $student->update(['guardian_id' => $guardian->id]);
 
-        return back()->with('status', 'Student profile linked to your guardian account.');
+        return back()->with('status', __('profile.flash.linked'));
     }
 }

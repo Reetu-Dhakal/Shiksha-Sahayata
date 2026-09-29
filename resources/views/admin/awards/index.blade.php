@@ -4,25 +4,25 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-lg font-semibold text-slate-900">Award Management</h1>
+    <h1 class="text-lg font-semibold text-slate-900">{{ __('admin.awards.index.title') }}</h1>
     <p class="mt-1 text-sm text-slate-600">
-        Issue awards for selected applications, track disbursement, and revoke awards when required.
+        {{ __('admin.awards.index.intro') }}
     </p>
 </div>
 
 <section class="mb-8">
-    <h2 class="mb-3 text-sm font-semibold text-slate-900">Selected applications awaiting an award</h2>
+    <h2 class="mb-3 text-sm font-semibold text-slate-900">{{ __('admin.awards.index.pending_title') }}</h2>
 
     @if ($selectedApplications->isEmpty())
-        <x-empty-state title="Nothing to issue" message="Applications appear here once the selection committee records a SELECTED decision." />
+        <x-empty-state :title="__('admin.awards.index.pending_empty_title')" :message="__('admin.awards.index.pending_empty_message')" />
     @else
         <div class="overflow-x-auto rounded border border-slate-200 bg-white">
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 text-xs uppercase text-slate-500">
                     <tr>
-                        <th class="px-4 py-3">Student</th>
-                        <th class="px-4 py-3">Scholarship</th>
-                        <th class="px-4 py-3">Decision</th>
+                        <th class="px-4 py-3">{{ __('admin.awards.index.student') }}</th>
+                        <th class="px-4 py-3">{{ __('admin.awards.index.scholarship') }}</th>
+                        <th class="px-4 py-3">{{ __('admin.awards.index.decision') }}</th>
                         <th class="px-4 py-3">{{ __('common.actions') }}</th>
                     </tr>
                 </thead>
@@ -41,7 +41,7 @@
                                 <form method="POST" action="{{ route('admin.awards.issue', $application) }}">
                                     @csrf
                                     <button type="submit" class="rounded bg-blue-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-900">
-                                        Issue award
+                                        {{ __('admin.awards.index.issue') }}
                                     </button>
                                 </form>
                             </td>
@@ -54,10 +54,10 @@
 </section>
 
 <section>
-    <h2 class="mb-3 text-sm font-semibold text-slate-900">Issued awards</h2>
+    <h2 class="mb-3 text-sm font-semibold text-slate-900">{{ __('admin.awards.index.issued_title') }}</h2>
 
     @if ($awards->isEmpty())
-        <x-empty-state title="No awards issued" message="Issued awards and their disbursement progress will be listed here." />
+        <x-empty-state :title="__('admin.awards.index.issued_empty_title')" :message="__('admin.awards.index.issued_empty_message')" />
     @else
         <div class="space-y-4">
             @foreach ($awards as $award)
@@ -70,8 +70,8 @@
                                 {{ $award->award_number }} · {{ $application->student->name }}
                             </h3>
                             <p class="mt-1 text-xs text-slate-600">
-                                Issued {{ $award->issued_at?->format('j M Y') ?: '—' }}
-                                · Code <span class="font-mono">{{ $award->verification_code }}</span>
+                                {{ __('admin.awards.index.issued_on', ['date' => format_date($award->issued_at)]) }}
+                                · {{ __('admin.awards.index.code') }} <span class="font-mono">{{ $award->verification_code }}</span>
                             </p>
                         </div>
                         <div class="flex flex-col items-end gap-2">
@@ -92,18 +92,18 @@
                                 @method('PATCH')
                                 <input type="hidden" name="disbursement_status" value="{{ $next->value }}">
                                 <div class="flex-1 min-w-56">
-                                    <label for="remarks-{{ $award->id }}" class="sr-only">Remarks</label>
+                                    <label for="remarks-{{ $award->id }}" class="sr-only">{{ __('common.remarks') }}</label>
                                     <input id="remarks-{{ $award->id }}" name="remarks" type="text" maxlength="1000"
-                                           placeholder="Remarks (optional)"
+                                           placeholder="{{ __('admin.awards.index.remarks_placeholder') }}"
                                            class="w-full rounded border border-slate-300 px-3 py-1.5 text-xs focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
                                 </div>
                                 <button type="submit" class="rounded border border-blue-800 px-3 py-1.5 text-xs font-medium text-blue-800 hover:bg-blue-50">
-                                    Mark as {{ $next->label() }}
+                                    {{ __('admin.awards.index.mark_as', ['status' => $next->label()]) }}
                                 </button>
                             </form>
                         @else
                             <p class="mt-3 border-t border-slate-100 pt-3 text-xs font-medium text-green-700">
-                                Disbursement confirmed and recorded on the application.
+                                {{ __('admin.awards.index.disbursement_confirmed') }}
                             </p>
                         @endif
 
@@ -112,24 +112,24 @@
                             @csrf
                             @method('PATCH')
                             <div class="flex-1 min-w-56">
-                                <label for="reason-{{ $award->id }}" class="sr-only">Revocation reason</label>
+                                <label for="reason-{{ $award->id }}" class="sr-only">{{ __('admin.awards.index.revocation_reason') }}</label>
                                 <input id="reason-{{ $award->id }}" name="reason" type="text" required minlength="10" maxlength="1000"
-                                       placeholder="Reason for revocation (required)"
+                                       placeholder="{{ __('admin.awards.index.revocation_placeholder') }}"
                                        class="w-full rounded border border-slate-300 px-3 py-1.5 text-xs focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500">
                             </div>
                             <button type="submit" class="rounded border border-red-600 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">
-                                Revoke award
+                                {{ __('admin.awards.index.revoke') }}
                             </button>
                         </form>
                     @elseif ($award->disbursement_remarks)
                         <p class="mt-3 rounded bg-slate-50 p-2 text-xs text-slate-600">
-                            Revocation reason: {{ $award->disbursement_remarks }}
+                            {{ __('admin.awards.index.revocation_reason') }}: {{ $award->disbursement_remarks }}
                         </p>
                     @endif
 
                     <div class="mt-3 border-t border-slate-100 pt-3">
                         <a href="{{ route('applications.show', $application) }}" class="text-xs font-medium text-blue-800 hover:underline">
-                            Open application
+                            {{ __('admin.awards.index.open_application') }}
                         </a>
                     </div>
                 </article>

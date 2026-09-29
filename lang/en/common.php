@@ -40,4 +40,22 @@ return [
     'potentially_suitable' => 'Potentially Suitable',
     'eligibility_disclaimer' => 'You may meet the published eligibility criteria. Final eligibility is subject to official verification.',
     'language' => 'Language',
+    'switch_language' => 'Switch to Nepali',
+
+    'grade_all' => 'All grades',
+    'grade_upto' => 'Up to grade :max',
+    'grade_from' => 'Grade :min and above',
+    'grade_range' => 'Grades :min – :max',
+    'any_level' => 'Any level',
+
+    'rule_equals' => ':field is exactly :value',
+    'rule_in' => ':field is one of (comma separated): :value',
+
+    'welcome_heading' => "Let's get started",
+    'welcome_ecosystem' => 'Laravel has an incredibly rich ecosystem.',
+    'welcome_suggest' => 'We suggest starting with the following.',
+    'welcome_read_docs' => 'Read the',
+    'welcome_documentation' => 'Documentation',
+    'welcome_tutorials' => 'Watch video tutorials at',
+    'welcome_deploy_now' => 'Deploy now',
 ];

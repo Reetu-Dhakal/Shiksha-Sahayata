@@ -9,10 +9,7 @@ enum EligibilityOperator: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::EQUALS => 'is exactly',
-            self::IN => 'is one of (comma separated)',
-        };
+        return __('enum.eligibility_operator.'.$this->value);
     }
 
     /**

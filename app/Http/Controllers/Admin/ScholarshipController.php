@@ -66,7 +66,7 @@ class ScholarshipController extends Controller
 
         return redirect()
             ->route('admin.scholarships.edit', $scholarship)
-            ->with('status', 'Scholarship created. Define eligibility rules, selection criteria, required documents and committee members before publishing.');
+            ->with('status', __('admin.flash.scholarship_created'));
     }
 
     public function edit(Scholarship $scholarship): View
@@ -85,7 +85,7 @@ class ScholarshipController extends Controller
 
         return redirect()
             ->route('admin.scholarships.edit', $scholarship)
-            ->with('status', 'Scholarship updated.');
+            ->with('status', __('admin.flash.scholarship_updated'));
     }
 
     public function updateStatus(Request $request, Scholarship $scholarship): RedirectResponse
@@ -96,7 +96,7 @@ class ScholarshipController extends Controller
 
         $this->scholarshipService->changeStatus($scholarship, ScholarshipStatus::from($data['status']));
 
-        return back()->with('status', 'Scholarship status changed to '.ScholarshipStatus::from($data['status'])->label().'.');
+        return back()->with('status', __('admin.flash.scholarship_status_changed', ['status' => ScholarshipStatus::from($data['status'])->label()]));
     }
 
     /**

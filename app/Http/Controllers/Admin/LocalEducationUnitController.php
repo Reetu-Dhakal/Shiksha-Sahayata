@@ -46,22 +46,22 @@ class LocalEducationUnitController extends Controller
 
         return redirect()
             ->route('admin.local-education-units.index')
-            ->with('status', 'Local education unit created.');
+            ->with('status', __('admin.flash.unit_created'));
     }
 
     public function edit(LocalEducationUnit $unit): View
     {
         return view('admin.local-education-units.form', [
-            'unit' => $local_education_unit,
+            'unit' => $unit,
         ]);
     }
 
     public function update(LocalEducationUnitRequest $request, LocalEducationUnit $unit): RedirectResponse
     {
-        $local_education_unit->update($request->validated());
+        $unit->update($request->validated());
 
         return redirect()
             ->route('admin.local-education-units.index')
-            ->with('status', 'Local education unit updated.');
+            ->with('status', __('admin.flash.unit_updated'));
     }
 }

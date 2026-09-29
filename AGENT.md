@@ -72,11 +72,32 @@ There are **no Policies/Gate classes**: authorization lives in the `role` middle
 
 ---
 
+## Localization (en / np)
+
+The UI is fully bilingual: `en` (English, default) and `np` (Nepali, Devanagari). `SetLocale` reads `session('locale')`; `POST /locale/{locale}` (the header toggle) switches it. **A screen is never mixed-language.**
+
+Rules:
+
+1. **No hardcoded UI text** in Blade or PHP — always `__('group.key')` / `trans_choice()`; group the keys logically in the file's own `lang/en/<group>.php` + `lang/np/<group>.php`.
+2. English values must stay **byte-identical** to what the tests assert (tests run in `en`). Nepali values are formal/administrative Nepali, no English words, no `नेपाली / English` pairs.
+3. Display dates with `format_date($date, 'j M Y')` (`app/helpers.php`) so Nepali month names render; never change machine formats (`Y-m-d` inputs, `Y-m-d H:i` filenames/CSV).
+4. Print model accessors and enum helpers as-is — `$scholarship->title|provider|description`, `$application->status->label()`, `$scholarship->gradeRangeLabel()`, `$rule->label()` already translate at read time.
+5. DB content has Nepali columns: `scholarships.title_np|description_np|provider_np`, `scholarship_criteria.name_np|description_np`, `scholarship_eligibility_rules.description_np`, `scholarship_documents.description_np` (admin scholarship form). Use `getRawOriginal('title')` when you need the stored English value (form re-display, CSV).
+6. Notifications store enum **values** and raw titles in `params`; `Notification::renderParams()` localises them for the reader.
+7. Validation messages: use framework keys; custom messages go through `__()` (Form Request `messages()`), never English literals.
+8. The language toggle always shows `__('common.switch_language')` — never a hardcoded "Nepali"/"English" label.
+9. Deliberate English-only: PDF award letter (dompdf has no Devanagari font), CSV export headers/rows, audit-log `description` records.
+10. Every `lang` key referenced from code must exist in **both** locales (`lang/np` mirrors `lang/en` key-for-key); `tests/Feature/LocaleTest.php` asserts `en` pages contain no Devanagari and `np` pages render Nepali.
+
+---
+
 ## Folder Structure
 
 ```text
+app/helpers.php                format_date(), pick_translation()
 app/Enums/                     Role, ApplicationStatus, ScholarshipStatus, VerificationStage/Status, Decision,
                                AppealStatus, AwardStatus, DisbursementStatus, NotificationType, DocumentType...
+                               (labels translate via lang/en|np/enum.php + status.php)
 app/Http/Controllers/          Auth, Dashboard, Public Scholarship, Application(+Document), Verification,
                                Selection, Appeal, Award, AwardVerification, Notification, Profile, Locale
 app/Http/Controllers/Admin/    Scholarship, School, LocalEducationUnit, Award, AuditLog, Report
@@ -87,7 +108,10 @@ app/Models/                    User, Guardian, Student, School, LocalEducationUn
                                Application, ApplicationDocument, Verification, CriterionScore, SelectionDecision,
                                Appeal, Award, Notification, AuditLog
 app/Services/                  Business logic (see Architecture above)
-database/migrations|seeders    Schema + fictional demo data
+database/migrations|seeders    Schema + fictional demo data (seeded scholarship text includes Nepali columns)
+lang/en|np                     All UI strings: common, nav, auth, home, layout, scholarship, verify,
+                               application, profile, award, dashboard, activity, workflow, admin,
+                               status, enum, notification, months, validation, pagination
 resources/views/               layouts, components, public pages, role dashboards, partials/nav
 routes/web.php                 Public + auth + role-grouped routes
 tests/Feature                  Feature tests for every phase
@@ -219,6 +243,7 @@ Wired events: application submitted (→ school officers, admins), returned for 
 - Notifications/audit: correct recipients, mark-as-read, append-only audit rows with actor + subject.
 - Assisted applications: officer jurisdiction enforced; applicants cannot see other students' rows.
 - Dashboards/reports: live aggregates, admin-only reports + CSV export.
+- Localization: `tests/Feature/LocaleTest.php` — `en` pages contain no Devanagari, `np` pages render Nepali and no English labels.
 
 Run: `php artisan test` (feature tests, in-memory SQLite), then `vendor/bin/pint` and `php artisan migrate:fresh --seed` against MySQL before committing.
 
@@ -240,6 +265,7 @@ Run: `php artisan test` (feature tests, in-memory SQLite), then `vendor/bin/pint
 12. Never commit secrets (`.env`, keys, credentials).
 13. Follow Laravel conventions (PSR-12, Eloquent relationships, route/model binding).
 14. Keep business logic in services; keep controllers thin.
+15. Never hardcode UI text — add `lang/{en,np}` keys instead (see Localization), and keep English values byte-identical.
 
 ## Git Workflow
 

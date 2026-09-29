@@ -24,13 +24,13 @@ class AwardService
     {
         if ($application->status !== ApplicationStatus::SELECTED) {
             throw ValidationException::withMessages([
-                'application' => 'Awards can only be issued for applications with a SELECTED decision.',
+                'application' => __('admin.errors.award_not_selected'),
             ]);
         }
 
         if ($application->award()->exists()) {
             throw ValidationException::withMessages([
-                'application' => 'An award has already been issued for this application.',
+                'application' => __('admin.errors.award_already_issued'),
             ]);
         }
 
@@ -54,7 +54,7 @@ class AwardService
             [$application->submitted_by_user_id ?? $application->student->user_id],
             NotificationType::AWARD_ISSUED,
             [
-                'scholarship' => $application->scholarship->title,
+                'scholarship' => $application->scholarship->getRawOriginal('title'),
                 'award' => $award->award_number,
             ],
             route('awards.index'),
@@ -66,7 +66,7 @@ class AwardService
                 'Award %s issued for application #%d (%s).',
                 $award->award_number,
                 $application->id,
-                $application->scholarship->title,
+                $application->scholarship->getRawOriginal('title'),
             ),
             $award,
             [],
@@ -81,7 +81,7 @@ class AwardService
     {
         if ($award->status === AwardStatus::REVOKED) {
             throw ValidationException::withMessages([
-                'award' => 'This award is already revoked.',
+                'award' => __('admin.errors.award_already_revoked'),
             ]);
         }
 
@@ -98,7 +98,7 @@ class AwardService
             [$application->submitted_by_user_id ?? $application->student->user_id],
             NotificationType::AWARD_REVOKED,
             [
-                'scholarship' => $application->scholarship->title,
+                'scholarship' => $application->scholarship->getRawOriginal('title'),
                 'award' => $award->award_number,
                 'reason' => $reason,
             ],
@@ -121,17 +121,16 @@ class AwardService
     {
         if ($award->status !== AwardStatus::ACTIVE) {
             throw ValidationException::withMessages([
-                'disbursement' => 'Disbursement cannot be tracked for a revoked award.',
+                'disbursement' => __('admin.errors.disbursement_revoked'),
             ]);
         }
 
         if (! $award->disbursement_status->canTransitionTo($status)) {
             throw ValidationException::withMessages([
-                'disbursement' => sprintf(
-                    'Disbursement status cannot move from %s to %s.',
-                    $award->disbursement_status->label(),
-                    $status->label(),
-                ),
+                'disbursement' => __('admin.errors.disbursement_transition', [
+                    'from' => $award->disbursement_status->label(),
+                    'to' => $status->label(),
+                ]),
             ]);
         }
 
@@ -156,7 +155,7 @@ class AwardService
                 [$application->submitted_by_user_id ?? $application->student->user_id],
                 NotificationType::DISBURSEMENT_CONFIRMED,
                 [
-                    'scholarship' => $application->scholarship->title,
+                    'scholarship' => $application->scholarship->getRawOriginal('title'),
                     'award' => $award->award_number,
                 ],
                 route('awards.index'),

@@ -40,4 +40,22 @@ return [
     'potentially_suitable' => 'सम्भावित उपयुक्त',
     'eligibility_disclaimer' => 'तपाईं प्रकाशित योग्यता मापदण्ड पूरा गर्न सक्नुहुन्छ। अन्तिम योग्यता आधिकारिक प्रमाणीकरणअन्तर्गत हुनेछ।',
     'language' => 'भाषा',
+    'switch_language' => 'अङ्ग्रेजीमा साट्नुहोस्',
+
+    'grade_all' => 'सबै ग्रेड',
+    'grade_upto' => 'ग्रेड :max सम्म',
+    'grade_from' => 'ग्रेड :min देखि माथि',
+    'grade_range' => 'ग्रेड :min – :max',
+    'any_level' => 'जुनसुकै तह',
+
+    'rule_equals' => ':field :value हो',
+    'rule_in' => ':field मध्ये: :value',
+
+    'welcome_heading' => 'सुरु गरौं',
+    'welcome_ecosystem' => 'Laravel मा अत्यन्त समृद्ध पारिस्थितिकी प्रणाली छ।',
+    'welcome_suggest' => 'तल दिइएकाबाट सुरु गर्न सुझाव गर्छौं।',
+    'welcome_read_docs' => 'दस्तावेजीकरण',
+    'welcome_documentation' => 'पढ्नुहोस्',
+    'welcome_tutorials' => 'भिडियो ट्युटोरियल हेर्नुहोस्',
+    'welcome_deploy_now' => 'अहिले नै डिप्लोय गर्नुहोस्',
 ];

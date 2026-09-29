@@ -27,7 +27,7 @@ class AppealRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'reason.min' => 'Explain clearly why the decision should be reviewed (at least 40 characters).',
+            'reason.min' => __('admin.validation.appeal_reason_min'),
         ];
     }
 }

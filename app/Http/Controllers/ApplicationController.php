@@ -103,7 +103,7 @@ class ApplicationController extends Controller
 
         return redirect()
             ->route('applications.show', $application)
-            ->with('status', 'Draft application created. Review it and submit before the deadline.');
+            ->with('status', __('application.flash.draft_created'));
     }
 
     public function show(Request $request, Application $application): View
@@ -125,7 +125,7 @@ class ApplicationController extends Controller
         if (! $application->isEditable()) {
             return redirect()
                 ->route('applications.show', $application)
-                ->withErrors(['application' => 'This application can no longer be edited.']);
+                ->withErrors(['application' => __('application.errors.not_editable')]);
         }
 
         return view('applications.edit', [
@@ -145,7 +145,7 @@ class ApplicationController extends Controller
 
         return redirect()
             ->route('applications.show', $application)
-            ->with('status', 'Application updated.');
+            ->with('status', __('application.flash.updated'));
     }
 
     public function submit(Request $request, Application $application): RedirectResponse
@@ -154,7 +154,7 @@ class ApplicationController extends Controller
 
         return redirect()
             ->route('applications.show', $application)
-            ->with('status', 'Application submitted. You can track its progress here.');
+            ->with('status', __('application.flash.submitted'));
     }
 
     public function destroy(Request $request, Application $application): RedirectResponse
@@ -163,7 +163,7 @@ class ApplicationController extends Controller
 
         return redirect()
             ->route('applications.index')
-            ->with('status', 'Draft application withdrawn.');
+            ->with('status', __('application.flash.withdrawn'));
     }
 
     /**
@@ -256,7 +256,7 @@ class ApplicationController extends Controller
             if ($student === null) {
                 return redirect()
                     ->route('profile.create')
-                    ->with('status', 'Create your student profile before applying for a scholarship.');
+                    ->with('status', __('application.flash.create_profile'));
             }
 
             return $student;
@@ -268,7 +268,7 @@ class ApplicationController extends Controller
             if ($students->isEmpty()) {
                 return redirect()
                     ->route('guardian.profile.show')
-                    ->with('status', 'Link a student profile before applying on their behalf.');
+                    ->with('status', __('application.flash.link_student'));
             }
 
             $student = $requestedId !== null
@@ -278,14 +278,14 @@ class ApplicationController extends Controller
             if ($student === null) {
                 return redirect()
                     ->route('guardian.profile.show')
-                    ->withErrors(['student_id' => 'Select one of your linked student profiles.']);
+                    ->withErrors(['student_id' => __('application.errors.select_linked_student')]);
             }
 
             return $student;
         }
 
         if ($user->isApplicant()) {
-            abort(403, 'Only students and guardians can submit applications.');
+            abort(403, __('application.errors.only_students_guardians'));
         }
 
         $students = $this->studentsFor($user);
@@ -293,7 +293,7 @@ class ApplicationController extends Controller
         if ($students->isEmpty()) {
             return redirect()
                 ->route('applications.index')
-                ->withErrors(['student_id' => 'No student profiles are available in your jurisdiction.']);
+                ->withErrors(['student_id' => __('application.errors.no_students_jurisdiction')]);
         }
 
         $student = $requestedId !== null
@@ -303,7 +303,7 @@ class ApplicationController extends Controller
         if ($student === null) {
             return redirect()
                 ->route('applications.index')
-                ->withErrors(['student_id' => 'Select a student profile within your jurisdiction.']);
+                ->withErrors(['student_id' => __('application.errors.select_student_jurisdiction')]);
         }
 
         return $student;

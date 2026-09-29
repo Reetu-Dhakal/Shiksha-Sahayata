@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('app.name')) — {{ __('common.tagline') }}</title>
+    <title>@yield('title', __('common.app_name')) — {{ __('common.tagline') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
@@ -15,7 +15,7 @@
                 @csrf
                 <label for="lang-switch" class="sr-only">{{ __('common.language') }}</label>
                 <button id="lang-switch" type="submit" class="rounded border border-blue-700 px-2 py-0.5 text-blue-100 hover:bg-blue-800">
-                    {{ app()->getLocale() === 'np' ? 'English' : 'नेपाली' }}
+                    {{ __('common.switch_language') }}
                 </button>
             </form>
         </div>

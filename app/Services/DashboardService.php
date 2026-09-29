@@ -62,18 +62,18 @@ class DashboardService
 
         return [
             'stats' => [
-                ['label' => 'Published scholarships', 'value' => Scholarship::query()->where('status', 'PUBLISHED')->count(), 'href' => route('admin.scholarships.index')],
-                ['label' => 'Applications received', 'value' => Application::query()->count(), 'href' => null],
-                ['label' => 'Awaiting verification', 'value' => Application::query()->whereIn('status', [
+                ['label' => __('dashboard.stats.published_scholarships'), 'value' => Scholarship::query()->where('status', 'PUBLISHED')->count(), 'href' => route('admin.scholarships.index')],
+                ['label' => __('dashboard.stats.applications_received'), 'value' => Application::query()->count(), 'href' => null],
+                ['label' => __('dashboard.stats.awaiting_verification'), 'value' => Application::query()->whereIn('status', [
                     ApplicationStatus::SUBMITTED->value,
                     ApplicationStatus::SCHOOL_VERIFICATION->value,
                     ApplicationStatus::LOCAL_VERIFICATION->value,
                 ])->count(), 'href' => null],
-                ['label' => 'Under selection review', 'value' => Application::query()->where('status', ApplicationStatus::UNDER_REVIEW->value)->count(), 'href' => null],
-                ['label' => 'Open appeals', 'value' => Appeal::query()->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW'])->count(), 'href' => route('appeals.index')],
-                ['label' => 'Awards issued', 'value' => Award::query()->count(), 'href' => route('admin.awards.index')],
-                ['label' => 'Disbursements confirmed', 'value' => Application::query()->where('status', ApplicationStatus::DISBURSEMENT_CONFIRMED->value)->count(), 'href' => route('admin.awards.index')],
-                ['label' => 'Registered users', 'value' => User::query()->count(), 'href' => null],
+                ['label' => __('dashboard.stats.under_selection_review'), 'value' => Application::query()->where('status', ApplicationStatus::UNDER_REVIEW->value)->count(), 'href' => null],
+                ['label' => __('dashboard.stats.open_appeals'), 'value' => Appeal::query()->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW'])->count(), 'href' => route('appeals.index')],
+                ['label' => __('dashboard.stats.awards_issued'), 'value' => Award::query()->count(), 'href' => route('admin.awards.index')],
+                ['label' => __('dashboard.stats.disbursements_confirmed'), 'value' => Application::query()->where('status', ApplicationStatus::DISBURSEMENT_CONFIRMED->value)->count(), 'href' => route('admin.awards.index')],
+                ['label' => __('dashboard.stats.registered_users'), 'value' => User::query()->count(), 'href' => null],
             ],
             'byStatus' => $byStatus,
             'rows' => collect(),
@@ -110,11 +110,11 @@ class DashboardService
 
         return [
             'stats' => [
-                ['label' => 'Pending verifications', 'value' => $pending, 'href' => route('verifications.index')],
-                ['label' => 'Verifications completed', 'value' => $verified, 'href' => route('verifications.index')],
-                ['label' => 'Returned for correction', 'value' => $returned, 'href' => route('verifications.index')],
-                ['label' => 'Assisted applications', 'value' => $assisted, 'href' => route('applications.index')],
-                ['label' => 'Students at this school', 'value' => Student::query()->where('school_id', $officer->school_id)->count(), 'href' => null],
+                ['label' => __('dashboard.stats.pending_verifications'), 'value' => $pending, 'href' => route('verifications.index')],
+                ['label' => __('dashboard.stats.verifications_completed'), 'value' => $verified, 'href' => route('verifications.index')],
+                ['label' => __('dashboard.stats.returned_for_correction'), 'value' => $returned, 'href' => route('verifications.index')],
+                ['label' => __('dashboard.stats.assisted_applications'), 'value' => $assisted, 'href' => route('applications.index')],
+                ['label' => __('dashboard.stats.students_at_school'), 'value' => Student::query()->where('school_id', $officer->school_id)->count(), 'href' => null],
             ],
             'byStatus' => collect(),
             'rows' => (clone $queue)->limit(5)->get(),
@@ -150,10 +150,10 @@ class DashboardService
 
         return [
             'stats' => [
-                ['label' => 'Pending verifications', 'value' => $pending, 'href' => route('verifications.index')],
-                ['label' => 'Verifications completed', 'value' => $verified, 'href' => route('verifications.index')],
-                ['label' => 'Returned for correction', 'value' => $returned, 'href' => route('verifications.index')],
-                ['label' => 'Students in jurisdiction', 'value' => Student::query()
+                ['label' => __('dashboard.stats.pending_verifications'), 'value' => $pending, 'href' => route('verifications.index')],
+                ['label' => __('dashboard.stats.verifications_completed'), 'value' => $verified, 'href' => route('verifications.index')],
+                ['label' => __('dashboard.stats.returned_for_correction'), 'value' => $returned, 'href' => route('verifications.index')],
+                ['label' => __('dashboard.stats.students_in_jurisdiction'), 'value' => Student::query()
                     ->where('district', $unit?->district)
                     ->where('municipality', $unit?->municipality)
                     ->count(), 'href' => null],
@@ -199,10 +199,10 @@ class DashboardService
 
         return [
             'stats' => [
-                ['label' => 'Assigned scholarships', 'value' => $assignedIds->count(), 'href' => null],
-                ['label' => 'Ready for review', 'value' => $underReview, 'href' => route('selection.index')],
-                ['label' => 'Decisions recorded', 'value' => $decisionsByOutcome->sum(), 'href' => route('selection.index')],
-                ['label' => 'Open appeals', 'value' => $openAppeals, 'href' => route('appeals.index')],
+                ['label' => __('dashboard.stats.assigned_scholarships'), 'value' => $assignedIds->count(), 'href' => null],
+                ['label' => __('dashboard.stats.ready_for_review'), 'value' => $underReview, 'href' => route('selection.index')],
+                ['label' => __('dashboard.stats.decisions_recorded'), 'value' => $decisionsByOutcome->sum(), 'href' => route('selection.index')],
+                ['label' => __('dashboard.stats.open_appeals'), 'value' => $openAppeals, 'href' => route('appeals.index')],
             ],
             'byStatus' => $decisionsByOutcome,
             'rows' => (clone $queue)->limit(5)->get(),
@@ -235,9 +235,9 @@ class DashboardService
 
         return [
             'stats' => [
-                ['label' => 'Applications', 'value' => Application::query()->whereIn('student_id', $studentIds)->count(), 'href' => route('applications.index')],
-                ['label' => 'Unread notifications', 'value' => $unread, 'href' => route('notifications.index')],
-                ['label' => 'Awards', 'value' => Award::query()->whereHas('application', fn ($query) => $query->whereIn('student_id', $studentIds))->count(), 'href' => route('awards.index')],
+                ['label' => __('dashboard.stats.applications'), 'value' => Application::query()->whereIn('student_id', $studentIds)->count(), 'href' => route('applications.index')],
+                ['label' => __('dashboard.stats.unread_notifications'), 'value' => $unread, 'href' => route('notifications.index')],
+                ['label' => __('dashboard.stats.awards'), 'value' => Award::query()->whereHas('application', fn ($query) => $query->whereIn('student_id', $studentIds))->count(), 'href' => route('awards.index')],
             ],
             'byStatus' => $byStatus,
             'rows' => Application::query()

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\Decision;
 use App\Enums\DocumentType;
 use App\Enums\EducationLevel;
 use App\Enums\Gender;
@@ -200,7 +201,8 @@ class NotificationTest extends TestCase
             ->first();
 
         $this->assertNotNull($notification);
-        $this->assertSame('Selected', $notification->params['decision'] ?? null);
+        $this->assertSame(Decision::SELECTED->value, $notification->params['decision'] ?? null);
+        $this->assertStringContainsString('Selected', $notification->body());
     }
 
     public function test_award_issuance_notifies_the_applicant(): void

@@ -29,7 +29,7 @@ class SelectionDecisionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'reason.min' => 'The decision reason must be at least 10 characters — applicants can see it.',
+            'reason.min' => __('admin.validation.selection_reason_min'),
         ];
     }
 }

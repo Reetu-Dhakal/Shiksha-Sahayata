@@ -6,7 +6,7 @@
 @php($editing = $school->exists)
 
 <div class="mb-6">
-    <h1 class="text-lg font-semibold text-slate-900">{{ $editing ? 'Edit school' : 'Add school' }}</h1>
+    <h1 class="text-lg font-semibold text-slate-900">{{ $editing ? __('admin.schools.form.edit') : __('admin.schools.form.add') }}</h1>
 </div>
 
 <form method="POST" action="{{ $editing ? route('admin.schools.update', $school) : route('admin.schools.store') }}"
@@ -24,7 +24,7 @@
             @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label for="school_code" class="mb-1 block text-sm font-medium text-slate-700">School code</label>
+            <label for="school_code" class="mb-1 block text-sm font-medium text-slate-700">{{ __('admin.schools.form.school_code') }}</label>
             <input id="school_code" name="school_code" type="text" value="{{ old('school_code', $school->school_code) }}"
                    class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('school_code') border-red-400 @enderror">
             @error('school_code')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
@@ -33,30 +33,30 @@
             <label for="status" class="mb-1 block text-sm font-medium text-slate-700">{{ __('common.status') }} *</label>
             <select id="status" name="status" required
                     class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
-                <option value="ACTIVE" @selected(old('status', $school->status) === 'ACTIVE')>Active</option>
-                <option value="INACTIVE" @selected(old('status', $school->status) === 'INACTIVE')>Inactive</option>
+                <option value="ACTIVE" @selected(old('status', $school->status) === 'ACTIVE')>{{ __('admin.active') }}</option>
+                <option value="INACTIVE" @selected(old('status', $school->status) === 'INACTIVE')>{{ __('admin.inactive') }}</option>
             </select>
         </div>
         <div>
-            <label for="province" class="mb-1 block text-sm font-medium text-slate-700">Province *</label>
+            <label for="province" class="mb-1 block text-sm font-medium text-slate-700">{{ __('admin.schools.form.province') }} *</label>
             <input id="province" name="province" type="text" value="{{ old('province', $school->province) }}" required
                    class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('province') border-red-400 @enderror">
             @error('province')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label for="district" class="mb-1 block text-sm font-medium text-slate-700">District *</label>
+            <label for="district" class="mb-1 block text-sm font-medium text-slate-700">{{ __('admin.schools.form.district') }} *</label>
             <input id="district" name="district" type="text" value="{{ old('district', $school->district) }}" required
                    class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('district') border-red-400 @enderror">
             @error('district')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label for="municipality" class="mb-1 block text-sm font-medium text-slate-700">Municipality *</label>
+            <label for="municipality" class="mb-1 block text-sm font-medium text-slate-700">{{ __('admin.schools.form.municipality') }} *</label>
             <input id="municipality" name="municipality" type="text" value="{{ old('municipality', $school->municipality) }}" required
                    class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 @error('municipality') border-red-400 @enderror">
             @error('municipality')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label for="address" class="mb-1 block text-sm font-medium text-slate-700">Address</label>
+            <label for="address" class="mb-1 block text-sm font-medium text-slate-700">{{ __('admin.schools.form.address') }}</label>
             <input id="address" name="address" type="text" value="{{ old('address', $school->address) }}"
                    class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
         </div>

@@ -74,6 +74,7 @@ class HomeController extends Controller
             $like = '%'.$filters['q'].'%';
             $query->where(function (Builder $builder) use ($like): void {
                 $builder->where('title', 'like', $like)
+                    ->orWhere('title_np', 'like', $like)
                     ->orWhere('provider', 'like', $like)
                     ->orWhere('description', 'like', $like);
             });
@@ -110,24 +111,24 @@ class HomeController extends Controller
 
             $events[] = [
                 'date' => $scholarship->created_at,
-                'type' => 'प्रकाशन / Publication',
-                'label' => 'नयाँ छात्रवृत्ति प्रकाशित: '.$scholarship->title,
+                'type' => __('home.notice_types.publication'),
+                'label' => __('home.notice_labels.published', ['title' => $scholarship->title]),
                 'url' => $url,
             ];
 
             if ($scholarship->application_start->lte(now())) {
                 $events[] = [
                     'date' => $scholarship->application_start,
-                    'type' => 'आवेदन / Application',
-                    'label' => 'आवेदन खुला: '.$scholarship->title,
+                    'type' => __('home.notice_types.application'),
+                    'label' => __('home.notice_labels.opened', ['title' => $scholarship->title]),
                     'url' => $url,
                 ];
             }
 
             $events[] = [
                 'date' => $scholarship->application_deadline,
-                'type' => 'म्याद / Deadline',
-                'label' => 'अन्तिम मिति: '.$scholarship->title,
+                'type' => __('home.notice_types.deadline'),
+                'label' => __('home.notice_labels.deadline', ['title' => $scholarship->title]),
                 'url' => $url,
             ];
         }

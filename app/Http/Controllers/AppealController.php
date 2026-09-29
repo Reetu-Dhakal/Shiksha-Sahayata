@@ -22,7 +22,7 @@ class AppealController extends Controller
 
         return redirect()
             ->route('applications.show', $application)
-            ->with('status', 'Your appeal has been submitted and is waiting for review.');
+            ->with('status', __('workflow.appeal.flash.submitted'));
     }
 
     public function index(Request $request): View
@@ -58,7 +58,7 @@ class AppealController extends Controller
 
         return redirect()
             ->route('appeals.show', $appeal)
-            ->with('status', 'Appeal reopened. The application is back under selection review.');
+            ->with('status', __('workflow.appeal.flash.reopened'));
     }
 
     public function decide(AppealReviewRequest $request, Appeal $appeal): RedirectResponse
@@ -72,6 +72,6 @@ class AppealController extends Controller
 
         return redirect()
             ->route('appeals.show', $appeal)
-            ->with('status', 'Appeal decision recorded.');
+            ->with('status', __('workflow.appeal.flash.decided'));
     }
 }

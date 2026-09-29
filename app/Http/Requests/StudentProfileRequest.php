@@ -48,9 +48,9 @@ class StudentProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'guardian_phone.regex' => 'Please enter a valid guardian phone number (digits, +, - or spaces only).',
-            'grade.min' => 'Grade must be between 1 and 12.',
-            'grade.max' => 'Grade must be between 1 and 12.',
+            'guardian_phone.regex' => __('admin.validation.guardian_phone_regex'),
+            'grade.min' => __('admin.validation.grade_min'),
+            'grade.max' => __('admin.validation.grade_max'),
         ];
     }
 }

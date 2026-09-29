@@ -35,7 +35,7 @@ class ApplicationDocumentController extends Controller
 
         if (! $application->isEditable()) {
             return back()->withErrors([
-                'file' => 'Documents can only be changed while the application is editable.',
+                'file' => __('application.errors.documents_locked_change'),
             ]);
         }
 
@@ -74,7 +74,7 @@ class ApplicationDocumentController extends Controller
             ]);
         }
 
-        return back()->with('status', 'Document uploaded.');
+        return back()->with('status', __('application.flash.document_uploaded'));
     }
 
     public function download(Request $request, Application $application, int $document): StreamedResponse
@@ -94,7 +94,7 @@ class ApplicationDocumentController extends Controller
 
         if (! $application->isEditable()) {
             return back()->withErrors([
-                'file' => 'Documents can only be removed while the application is editable.',
+                'file' => __('application.errors.documents_locked_remove'),
             ]);
         }
 
@@ -102,6 +102,6 @@ class ApplicationDocumentController extends Controller
         Storage::disk(self::DISK)->delete($file->path);
         $file->delete();
 
-        return back()->with('status', 'Document removed.');
+        return back()->with('status', __('application.flash.document_removed'));
     }
 }

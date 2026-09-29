@@ -28,28 +28,6 @@ class RegisterRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'email.required_without' => 'Please provide an email address or a phone number.',
-            'phone.required_without' => 'Please provide a phone number or an email address.',
-            'phone.regex' => 'Please enter a valid phone number (digits, +, - or spaces only).',
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'account_type' => 'account type',
-        ];
-    }
-
     public function accountRole(): Role
     {
         return $this->input('account_type') === 'guardian' ? Role::GUARDIAN : Role::STUDENT;

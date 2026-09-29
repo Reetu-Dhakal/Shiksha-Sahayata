@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Documents')
+@section('title', __('application.documents.title'))
 
 @section('content')
 <div class="mb-6">
     <nav class="text-xs text-slate-500">
-        <a href="{{ route('applications.index') }}" class="hover:text-blue-800">My applications</a>
+        <a href="{{ route('applications.index') }}" class="hover:text-blue-800">{{ __('application.my_applications') }}</a>
         <span class="mx-1">/</span>
         <a href="{{ route('applications.show', $application) }}" class="hover:text-blue-800">{{ $application->scholarship->title }}</a>
         <span class="mx-1">/</span>
-        <span>Documents</span>
+        <span>{{ __('application.documents.title') }}</span>
     </nav>
-    <h1 class="mt-2 text-lg font-semibold text-slate-900">Supporting documents</h1>
+    <h1 class="mt-2 text-lg font-semibold text-slate-900">{{ __('application.documents.heading') }}</h1>
     <p class="mt-1 text-sm text-slate-600">
-        Upload every required document before submitting. Accepted formats: PDF, JPG or PNG, maximum 5 MB each.
+        {{ __('application.documents.intro') }}
     </p>
     <div class="mt-2">
         <x-status-badge :type="$application->status->badgeType()" :label="$application->status->label()" />
@@ -22,7 +22,7 @@
 
 @if (! $application->isEditable())
     <div class="mb-4 rounded border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        This application is {{ $application->status->label() }}, so its documents are locked.
+        {{ __('application.documents.locked', ['status' => $application->status->label()]) }}
     </div>
 @endif
 
@@ -33,9 +33,9 @@
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <h2 class="text-sm font-semibold text-slate-900">{{ $document->document_type->label() }}</h2>
-                    <p class="mt-1 text-xs text-slate-500">{{ $document->description ?: 'No special instructions.' }}</p>
+                    <p class="mt-1 text-xs text-slate-500">{{ $document->description ?: __('application.documents.no_instructions') }}</p>
                 </div>
-                <x-status-badge :type="$document->is_required ? 'warning' : 'neutral'" :label="$document->is_required ? 'Required' : 'Optional'" />
+                <x-status-badge :type="$document->is_required ? 'warning' : 'neutral'" :label="$document->is_required ? __('common.required') : __('common.optional')" />
             </div>
 
             @if ($uploaded)
@@ -43,18 +43,18 @@
                     <div class="text-sm text-green-900">
                         <p class="font-medium">{{ $uploaded->original_filename }}</p>
                         <p class="text-xs text-green-700">
-                            Uploaded {{ $uploaded->created_at->format('j M Y, H:i') }}
-                            @if ($uploaded->size_bytes) · {{ number_format($uploaded->size_bytes / 1024, 1) }} KB @endif
+                            {{ __('application.documents.uploaded_at', ['date' => format_date($uploaded->created_at, 'j M Y, H:i')]) }}
+                            @if ($uploaded->size_bytes) · {{ __('application.documents.file_size', ['size' => number_format($uploaded->size_bytes / 1024, 1)]) }} @endif
                         </p>
                     </div>
                     <div class="flex gap-3 text-xs">
-                        <a href="{{ route('applications.documents.download', [$application, $uploaded->id]) }}" class="font-medium text-blue-800 hover:underline">Download</a>
+                        <a href="{{ route('applications.documents.download', [$application, $uploaded->id]) }}" class="font-medium text-blue-800 hover:underline">{{ __('application.documents.download') }}</a>
                         @if ($application->isEditable())
                             <form method="POST" action="{{ route('applications.documents.destroy', [$application, $uploaded->id]) }}"
-                                  onsubmit="return confirm('Remove this document?');">
+                                  onsubmit="return confirm('{{ __('application.documents.remove_confirm') }}');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="font-medium text-red-700 hover:underline">Remove</button>
+                                <button type="submit" class="font-medium text-red-700 hover:underline">{{ __('application.documents.remove') }}</button>
                             </form>
                         @endif
                     </div>
@@ -69,7 +69,7 @@
 
                     <div class="min-w-64 flex-1">
                         <label class="mb-1 block text-xs font-medium text-slate-600">
-                            {{ $uploaded ? 'Replace file' : 'Choose file' }}
+                            {{ $uploaded ? __('application.documents.replace_file') : __('application.documents.choose_file') }}
                         </label>
                         <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" required
                                class="block w-full text-sm text-slate-600 file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-blue-800 hover:file:bg-blue-100">
@@ -78,19 +78,19 @@
                     </div>
 
                     <button type="submit" class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900">
-                        {{ $uploaded ? 'Replace' : 'Upload' }}
+                        {{ $uploaded ? __('application.documents.replace') : __('application.documents.upload') }}
                     </button>
                 </form>
             @endif
         </section>
     @empty
-        <x-empty-state title="No documents are required for this scholarship" message="You can submit without uploading anything." />
+        <x-empty-state :title="__('application.documents.empty_title')" :message="__('application.documents.empty_message')" />
     @endforelse
 </div>
 
 <div class="mt-6 flex gap-3">
     <a href="{{ route('applications.show', $application) }}" class="rounded border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-        Back to application
+        {{ __('application.documents.back') }}
     </a>
 </div>
 @endsection

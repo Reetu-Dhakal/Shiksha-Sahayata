@@ -6,6 +6,166 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Noto Sans', 'Noto Sans Devanagari', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-gov-blue: #1557A6;
+    --color-gov-dark: #0B3D78;
+    --color-gov-light: #EEF5FC;
+    --color-gov-pale: #F5F9FD;
+    --color-gov-ink: #263238;
+    --color-gov-muted: #5F6B76;
+    --color-gov-red: #D32F2F;
+    --color-gov-line: #D7E3F2;
+}
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .gov-body {
+        font-family: 'Noto Sans', 'Noto Sans Devanagari', ui-sans-serif, system-ui, sans-serif;
+        color: var(--color-gov-ink);
+        background-color: #FFFFFF;
+    }
+
+    .gov-section-title {
+        color: var(--color-gov-dark);
+        font-size: 1.125rem;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .gov-section-title::after {
+        content: '';
+        display: block;
+        width: 3rem;
+        height: 3px;
+        margin-top: 0.4rem;
+        background-color: var(--color-gov-red);
+        border-radius: 2px;
+    }
+
+    .gov-section-en {
+        display: block;
+        margin-top: 0.35rem;
+        color: var(--color-gov-muted);
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .gov-card {
+        background-color: #FFFFFF;
+        border: 1px solid var(--color-gov-line);
+        border-radius: 6px;
+        box-shadow: 0 1px 2px rgb(11 61 120 / 0.05);
+    }
+
+    .gov-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.25rem;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .gov-btn-primary {
+        background-color: var(--color-gov-blue);
+        color: #FFFFFF;
+    }
+
+    .gov-btn-primary:hover {
+        background-color: var(--color-gov-dark);
+    }
+
+    .gov-btn-outline {
+        border: 1px solid var(--color-gov-blue);
+        color: var(--color-gov-blue);
+        background-color: #FFFFFF;
+    }
+
+    .gov-btn-outline:hover {
+        background-color: var(--color-gov-light);
+    }
+
+    .gov-input {
+        width: 100%;
+        border: 1px solid var(--color-gov-line);
+        border-radius: 4px;
+        background-color: #FFFFFF;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: var(--color-gov-ink);
+    }
+
+    .gov-input:focus {
+        outline: none;
+        border-color: var(--color-gov-blue);
+        box-shadow: 0 0 0 2px rgb(21 87 166 / 0.18);
+    }
+
+    .gov-link {
+        color: var(--color-gov-blue);
+        transition: color 0.15s ease;
+    }
+
+    .gov-link:hover {
+        color: var(--color-gov-dark);
+        text-decoration: underline;
+    }
+
+    .gov-icon-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 9999px;
+        background-color: var(--color-gov-light);
+        border: 1px solid var(--color-gov-line);
+        color: var(--color-gov-blue);
+        flex: none;
+    }
+
+    .gov-nav-link {
+        display: inline-flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 0.85rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-gov-dark);
+        border-bottom: 3px solid transparent;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .gov-nav-link:hover {
+        background-color: var(--color-gov-light);
+        border-bottom-color: var(--color-gov-line);
+    }
+
+    .gov-nav-link-active,
+    .gov-nav-link-active:hover {
+        border-bottom-color: var(--color-gov-red);
+        background-color: #FFFFFF;
+    }
+
+    .gov-meta {
+        font-size: 0.75rem;
+        color: var(--color-gov-muted);
+    }
+
+    .gov-divider {
+        border-top: 1px solid var(--color-gov-line);
+    }
 }

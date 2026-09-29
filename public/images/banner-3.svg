@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" role="img" aria-label="Books, certificate and graduation cap">
+  <rect width="1600" height="500" fill="#E4EEFA"/>
+  <circle cx="1210" cy="250" r="210" fill="#D3E4F7"/>
+  <circle cx="330" cy="250" r="170" fill="#DCE9F7"/>
+
+  <g>
+    <rect x="180" y="330" width="300" height="46" rx="6" fill="#1557A6"/>
+    <rect x="205" y="284" width="250" height="46" rx="6" fill="#D32F2F"/>
+    <rect x="230" y="238" width="200" height="46" rx="6" fill="#0B3D78"/>
+    <path d="M250 261 h120 M225 307 h160 M200 353 h200" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  </g>
+
+  <g transform="translate(1080 170)">
+    <path d="M120 40 L240 90 L120 140 L0 90 Z" fill="#0B3D78"/>
+    <path d="M60 108 v46 c0 22 27 38 60 38 s60 -16 60 -38 v-46" fill="#1557A6"/>
+    <path d="M240 90 v58" stroke="#0B3D78" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="240" cy="158" r="12" fill="#F6D98A"/>
+    <path d="M240 170 v26" stroke="#0B3D78" stroke-width="5"/>
+    <path d="M226 196 h28 l-14 24 z" fill="#D32F2F"/>
+  </g>
+
+  <g transform="translate(640 130)">
+    <rect x="0" y="0" width="320" height="240" rx="10" fill="#FFFFFF" stroke="#1557A6" stroke-width="6"/>
+    <rect x="26" y="30" width="268" height="180" rx="6" fill="#F7FAFE" stroke="#9CC3EC" stroke-width="3"/>
+    <path d="M60 78 h150 M60 112 h200 M60 146 h120" stroke="#9CC3EC" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="248" cy="172" r="26" fill="#D32F2F"/>
+    <path d="M236 172 l9 9 l17 -20" stroke="#FFFFFF" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M248 198 l-16 34 16 -10 16 10 z" fill="#D32F2F"/>
+  </g>
+
+  <g fill="#9CC3EC">
+    <rect x="1440" y="80" width="70" height="70" rx="8"/>
+    <rect x="110" y="80" width="54" height="54" rx="8"/>
+    <rect x="520" y="400" width="64" height="64" rx="8"/>
+  </g>
+</svg>
